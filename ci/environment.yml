@@ -1,4 +1,4 @@
-name: salisfy-dev
+name: integral-dev
 channels:
   - conda-forge
 dependencies:

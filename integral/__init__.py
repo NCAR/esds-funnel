@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" Top-level module for salisfy. """
+""" Top-level module for integral. """
 from pkg_resources import DistributionNotFound, get_distribution
 
 try:

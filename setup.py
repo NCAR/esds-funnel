@@ -21,18 +21,18 @@ CLASSIFIERS = [
 ]
 
 setup(
-    name='salisfy',
-    description='salisfy',
+    name='integral',
+    description='Integral: A Python package to facilitate synthesis and analysis of Earth system data.',
     long_description=LONG_DESCRIPTION,
     python_requires='>=3.6',
     maintainer='NCAR XDev Team',
     maintainer_email='xdev@ucar.edu',
     classifiers=CLASSIFIERS,
-    url='https://salisfy.readthedocs.io',
+    url='https://integral.readthedocs.io',
     project_urls={
-        'Documentation': 'https://salisfy.readthedocs.io',
-        'Source': 'https://github.com/NCAR/salisfy',
-        'Tracker': 'https://github.com/NCAR/salisfy/issues',
+        'Documentation': 'https://integral.readthedocs.io',
+        'Source': 'https://github.com/NCAR/integral',
+        'Tracker': 'https://github.com/NCAR/integral/issues',
     },
     packages=find_packages(exclude=('tests',)),
     include_package_data=True,
@@ -40,7 +40,7 @@ setup(
     license='Apache 2.0',
     zip_safe=False,
     entry_points={},
-    keywords='reproducible science xarray',
+    keywords='reproducible science xarray earth system model',
     use_scm_version={'version_scheme': 'post-release', 'local_scheme': 'dirty-tag'},
     setup_requires=['setuptools_scm', 'setuptools>=30.3.0'],
 )
