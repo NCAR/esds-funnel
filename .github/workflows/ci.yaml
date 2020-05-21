@@ -28,7 +28,7 @@ jobs:
           key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('ci/environment.yml') }}
       - uses: goanpeca/setup-miniconda@v1
         with:
-          activate-environment: historique-dev
+          activate-environment: salisfy-dev
           auto-update-conda: false
           python-version: ${{ matrix.python-version }}
           environment-file: ci/environment.yml
@@ -38,3 +38,8 @@ jobs:
         run: |
           python -m pip install -e .
           conda list
+
+      - name: Run Tests
+        shell: bash -l {0}
+        run: |
+          pytest -v

@@ -1,1 +1,4 @@
 dask[complete]
+xarray
+zarr
+netcdf4

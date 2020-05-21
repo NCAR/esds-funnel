@@ -1,0 +1,9 @@
+name: salisfy-dev
+channels:
+  - conda-forge
+dependencies:
+  - dask
+  - xarray
+  - zarr
+  - netcdf4
+  - pytest
