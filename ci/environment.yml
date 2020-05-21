@@ -7,3 +7,5 @@ dependencies:
   - zarr
   - netcdf4
   - pytest
+  - pytest-cov
+  - intake-esm

@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 
 with open('requirements.txt') as f:
     INSTALL_REQUIREs = f.read().strip().split('\n')
-with open('README.md', encoding='utf8') as f:
+with open('README.rst', encoding='utf8') as f:
     LONG_DESCRIPTION = f.read()
 CLASSIFIERS = [
     'Development Status :: 4 - Beta',
