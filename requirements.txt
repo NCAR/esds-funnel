@@ -2,4 +2,4 @@ dask[complete]
 xarray
 zarr
 netcdf4
-intak-esm>=2020.5.1
+intake-esm>=2020.5.1
