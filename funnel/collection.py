@@ -3,7 +3,9 @@ import typing
 import intake
 import pydantic
 
-from .config import Settings, settings as _default_settings
+from .config import Settings
+
+_default_settings = Settings()
 
 
 @pydantic.dataclasses.dataclass
@@ -14,6 +16,11 @@ class Collection:
     persist: bool = False
     settings: Settings = _default_settings
 
-    def __post_init__post_parse__(self):
-        self._whole_catalog = intake.open_esm_datastore(self.esm_collection_json)
-        self.catalog = self._whole_catalog.search(**self.query)
+    def __post_init_post_parse__(self):
+        self.catalog = intake.open_esm_datastore(self.esm_collection_json)
+        self._variable_column_name = self.catalog.variable_column_name
+        self._query_without_vars = self.query.copy()
+        self._requested_variables = self._query_without_vars.pop(self._variable_column_name)
+        self._base_variables = self.catalog.unique(self._variable_column_name)[
+            self._variable_column_name
+        ]['values']

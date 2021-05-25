@@ -16,6 +16,3 @@ default_conf_dir.mkdir(parents=True, exist_ok=True)
 class Settings(pydantic.BaseSettings):
     cache_dir: pydantic.DirectoryPath = default_conf_dir
     cache_format: CacheFormatEnum = 'netcdf'
-
-
-settings = Settings()
