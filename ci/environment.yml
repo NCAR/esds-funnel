@@ -1,11 +1,15 @@
 name: esds-funnel-dev
 channels:
   - conda-forge
+  - nodefaults
 dependencies:
   - dask
-  - xarray
-  - zarr
+  - intake-esm
   - netcdf4
+  - pydantic
   - pytest
   - pytest-cov
-  - intake-esm
+  - pytest-sugar
+  - pytest-xdist
+  - xarray
+  - zarr
