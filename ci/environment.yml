@@ -1,4 +1,4 @@
-name: integral-dev
+name: esds-funnel-dev
 channels:
   - conda-forge
 dependencies:
