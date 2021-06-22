@@ -39,6 +39,9 @@ class CacheStore:
     def keys(self):
         return list(self.mapper.keys())
 
+    def delete(self, key, **kwargs):
+        self.fs.delete(key, **kwargs)
+
     def put(self, key, value, serializer=None):
         method = getattr(self, f'_put_{self.on_duplicate_key.value}')
         return method(key, value)

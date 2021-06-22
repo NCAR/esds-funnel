@@ -17,3 +17,11 @@ def test_cache_put_and_get(key, data):
     assert key in store.keys()
     results = store.get(key)
     assert results == data
+
+
+@pytest.mark.parametrize('key, data', [('bar/test', 'my_data'), ('foo', [1, 3, 4])])
+def test_delete(key, data):
+    store = CacheStore('memory://')
+    store.put(key, data)
+    store.delete(key)
+    assert key not in store.keys()
