@@ -49,5 +49,5 @@ class CacheStore:
 
     def _put_overwrite(self, key, value, serializer=None):
         with self.fs.transaction:
-            with self.fs.open(key, 'w') as f:
-                f.write(json.dumps(value))
+            if self.protocol == 'memory':
+                self.mapper[key] = json.dumps(value).encode('utf-8')
