@@ -16,8 +16,7 @@ class DuplicateKeyEnum(str, enum.Enum):
 @pydantic.dataclasses.dataclass
 class CacheStore:
     path: str
-    read: bool = True
-    write: bool = True
+    readonly: bool = False
     on_duplicate_key: DuplicateKeyEnum = 'skip'
     storage_options: typing.Dict = None
 
@@ -43,8 +42,9 @@ class CacheStore:
         self.fs.delete(key, **kwargs)
 
     def put(self, key, value, serializer=None):
-        method = getattr(self, f'_put_{self.on_duplicate_key.value}')
-        return method(key, value)
+        if not self.readonly:
+            method = getattr(self, f'_put_{self.on_duplicate_key.value}')
+            return method(key, value)
 
     def _put_skip(self, key, value, serializer=None):
         if key not in self:
