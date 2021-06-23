@@ -1,0 +1,3 @@
+component,stream,case,member_id,variable,start_time,end_time,time_range,long_name,units,vertical_levels,frequency,path
+ocn,pop.h,b.e20.B1850.f19_g17.test,,SALT,0001-01,0001-12,000101-000112,Salinity,gram/kilogram,1,month_1,../data/b.e20.B1850.f19_g17.test.pop.h.SALT.000101-000112.nc
+ocn,pop.h,b.e20.B1850.f19_g17.test,,TEMP,0001-01,0001-12,000101-000112,Potential Temperature,degC,1,month_1,../data/b.e20.B1850.f19_g17.test.pop.h.TEMP.000101-000112.nc

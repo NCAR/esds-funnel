@@ -1,0 +1,85 @@
+{
+  "catalog_file": "test_catalog.csv",
+  "attributes": [
+    {
+      "column_name": "component",
+      "vocabulary": ""
+    },
+    {
+      "column_name": "stream",
+      "vocabulary": ""
+    },
+    {
+      "column_name": "case",
+      "vocabulary": ""
+    },
+    {
+      "column_name": "member_id",
+      "vocabulary": ""
+    },
+    {
+      "column_name": "variable",
+      "vocabulary": ""
+    },
+    {
+      "column_name": "start_time",
+      "vocabulary": ""
+    },
+    {
+      "column_name": "end_time",
+      "vocabulary": ""
+    },
+    {
+      "column_name": "time_range",
+      "vocabulary": ""
+    },
+    {
+      "column_name": "long_name",
+      "vocabulary": ""
+    },
+    {
+      "column_name": "units",
+      "vocabulary": ""
+    },
+    {
+      "column_name": "vertical_levels",
+      "vocabulary": ""
+    },
+    {
+      "column_name": "frequency",
+      "vocabulary": ""
+    },
+    {
+      "column_name": "path",
+      "vocabulary": ""
+    }
+  ],
+  "assets": {
+    "column_name": "path",
+    "format": "netcdf"
+  },
+  "aggregation_control": {
+    "variable_column_name": "variable",
+    "groupby_attrs": ["component", "stream", "case"],
+    "aggregations": [
+      {
+        "type": "union",
+        "attribute_name": "variable",
+        "options": null
+      },
+      {
+        "type": "join_existing",
+        "attribute_name": "time_range",
+        "options": {
+          "dim": "time",
+          "coords": "minimal",
+          "compat": "override"
+        }
+      }
+    ]
+  },
+  "esmcat_version": "0.0.1",
+  "id": null,
+  "description": null,
+  "last_updated": "2021-06-23T14:49:06+00:00"
+}
