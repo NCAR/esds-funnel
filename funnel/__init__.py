@@ -4,8 +4,6 @@
 from pkg_resources import DistributionNotFound, get_distribution
 
 from .cache import CacheStore
-from .collection import Collection
-from .config import Settings
 from .registry import registry
 from .serializers import pick_serializer, serializers
 
