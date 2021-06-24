@@ -1,5 +1,6 @@
 import fsspec
 import pytest
+import xarray as xr
 
 from funnel import CacheStore
 
@@ -18,7 +19,21 @@ def test_put_and_get(key, data):
     store = CacheStore('memory://')
     store.put(key, data)
     assert key in store.keys()
-    results = store.get(key)
+    results = store.get(key, None)
+    assert results == data
+
+
+@pytest.mark.parametrize(
+    'key, data, serializer',
+    [
+        ('foo', {'a': [1, 2, 3], 'b': True}, 'joblib'),
+        ('test.nc', xr.DataArray([1, 2]).to_dataset(name='sst'), 'xarray.netcdf'),
+    ],
+)
+def test_put_and_get_local(key, data, serializer, tmpdir):
+    store = CacheStore(str(tmpdir))
+    store.put(key, data)
+    results = store.get(key, serializer)
     assert results == data
 
 

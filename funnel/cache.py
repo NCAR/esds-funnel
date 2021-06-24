@@ -5,6 +5,8 @@ import typing
 import fsspec
 import pydantic
 
+from .serializers import Serializer, pick_serializer, serializers
+
 
 class DuplicateKeyEnum(str, enum.Enum):
     skip = 'skip'
@@ -27,10 +29,20 @@ class CacheStore:
         self.raw_path = self.fs._strip_protocol(self.path)
         self.protocol = self.fs.protocol
 
-    def get(self, key: str):
+    def __getitem__(self, key: str, *args, **kwargs):
+        return self.get(key, *args, **kwargs)
+
+    def _construct_item_path(self, key):
+        return f'{self.path}/{key}'
+
+    def get(self, key: str, serializer: str, **serializer_kwargs):
         if self.protocol == 'memory':
             data = self.mapper[key]
             return json.loads(data)
+
+        else:
+            serializer = serializers.get(serializer)()
+            return serializer.load(self._construct_item_path(key), **serializer_kwargs)
 
     def __contains__(self, key: str):
         return key in self.mapper
@@ -41,16 +53,20 @@ class CacheStore:
     def delete(self, key, **kwargs):
         self.fs.delete(key, **kwargs)
 
-    def put(self, key, value, serializer=None):
+    def put(self, key, value, serializer: str = 'auto', **serializer_kwargs):
         if not self.readonly:
             method = getattr(self, f'_put_{self.on_duplicate_key.value}')
-            return method(key, value)
+            serializer = pick_serializer(value) if 'auto' else serializer
+            serializer = serializers.get(serializer)()
+            return method(key, value, serializer, **serializer_kwargs)
 
-    def _put_skip(self, key, value, serializer=None):
+    def _put_skip(self, key, value, serializer: Serializer, **serializer_kwargs):
         if key not in self:
-            self._put_overwrite(key, value, serializer)
+            self._put_overwrite(key, value, serializer, **serializer_kwargs)
 
-    def _put_overwrite(self, key, value, serializer=None):
+    def _put_overwrite(self, key, value, serializer: Serializer, **serializer_kwargs):
         with self.fs.transaction:
             if self.protocol == 'memory':
                 self.mapper[key] = json.dumps(value).encode('utf-8')
+            else:
+                serializer.dump(value, self._construct_item_path(key), **serializer_kwargs)
