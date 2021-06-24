@@ -5,8 +5,11 @@ channels:
 dependencies:
   - catalogue
   - dask
+  - fsspec
   - intake-esm
+  - joblib
   - netcdf4
+  - pip
   - pydantic
   - pytest
   - pytest-cov
@@ -14,3 +17,5 @@ dependencies:
   - pytest-xdist
   - xarray
   - zarr
+  - pip:
+      - -r ../requirements.txt
