@@ -5,7 +5,9 @@ import xarray as xr
 from funnel import CacheStore
 
 
-@pytest.mark.parametrize('path', ['memory://', 'file://', '~/test'])
+@pytest.mark.parametrize(
+    'path', ['memory://', 'file://', '~/test', 'github://pydata:xarray-data@master/']
+)
 @pytest.mark.parametrize('readonly', [True, False])
 def test_initialization(path, readonly):
     store = CacheStore(path, readonly=readonly)
@@ -28,12 +30,13 @@ def test_put_and_get(key, data):
     [
         ('foo', {'a': [1, 2, 3], 'b': True}, 'joblib'),
         ('test.nc', xr.DataArray([1, 2]).to_dataset(name='sst'), 'xarray.netcdf'),
+        ('my_dataset.zarr', xr.DataArray([1, 2]).to_dataset(name='sst'), 'xarray.zarr'),
     ],
 )
 def test_put_and_get_local(key, data, serializer, tmpdir):
     store = CacheStore(str(tmpdir))
-    store.put(key, data)
-    results = store.get(key, serializer)
+    store.put(key, data, serializer=serializer)
+    results = store.get(key, serializer=serializer)
     assert results == data
 
 

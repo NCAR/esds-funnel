@@ -7,7 +7,7 @@ from .cache import CacheStore
 from .collection import Collection
 from .config import Settings
 from .registry import registry
-from .serializers import pick_serializer
+from .serializers import pick_serializer, serializers
 
 try:
     __version__ = get_distribution('esds-funnel').version

@@ -34,7 +34,7 @@ def joblib():
 
 @functools.singledispatch
 def pick_serializer(obj):
-    """Returns the appropriate serializer
+    """Returns the id of the appropriate serializer
 
     Parameters
     ----------

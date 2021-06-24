@@ -17,6 +17,11 @@ class DuplicateKeyEnum(str, enum.Enum):
 
 @pydantic.dataclasses.dataclass
 class CacheStore:
+    """Implements caching functionality. Support backends (in-memory, local, s3fs, etc...) scheme registered with fsspec.
+
+    Some backends may require other dependencies. For example to work with S3 cache store, s3fs is required.
+    """
+
     path: str
     readonly: bool = False
     on_duplicate_key: DuplicateKeyEnum = 'skip'
@@ -56,7 +61,7 @@ class CacheStore:
     def put(self, key, value, serializer: str = 'auto', **serializer_kwargs):
         if not self.readonly:
             method = getattr(self, f'_put_{self.on_duplicate_key.value}')
-            serializer = pick_serializer(value) if 'auto' else serializer
+            serializer = pick_serializer(value) if serializer == 'auto' else serializer
             serializer = serializers.get(serializer)()
             return method(key, value, serializer, **serializer_kwargs)
 
