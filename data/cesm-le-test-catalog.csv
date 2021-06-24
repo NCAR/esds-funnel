@@ -1,0 +1,11 @@
+variable,long_name,component,experiment,frequency,vertical_levels,spatial_domain,units,start_time,end_time,path
+FLNS,net longwave flux at surface,atm,RCP85,monthly,1.0,global,W/m2,2006-01-16 12:00:00,2100-12-16 12:00:00,s3://ncar-cesm-lens/atm/monthly/cesmLE-RCP85-FLNS.zarr
+FLNSC,clearsky net longwave flux at surface,atm,RCP85,monthly,1.0,global,W/m2,2006-01-16 12:00:00,2100-12-16 12:00:00,s3://ncar-cesm-lens/atm/monthly/cesmLE-RCP85-FLNSC.zarr
+aice,ice area  (aggregate),ice_nh,RCP85,monthly,1.0,artic_ocean,%,2006-01-16 12:00:00,2100-12-16 12:00:00,s3://ncar-cesm-lens/ice_nh/monthly/cesmLE-RCP85-aice.zarr
+hi,grid cell mean ice thickness,ice_nh,RCP85,monthly,1.0,artic_ocean,m,2006-01-16 12:00:00,2100-12-16 12:00:00,s3://ncar-cesm-lens/ice_nh/monthly/cesmLE-RCP85-hi.zarr
+aice,ice area  (aggregate),ice_sh,RCP85,monthly,1.0,antarctica,%,2006-01-16 12:00:00,2100-12-16 12:00:00,s3://ncar-cesm-lens/ice_sh/monthly/cesmLE-RCP85-aice.zarr
+hi,grid cell mean ice thickness,ice_sh,RCP85,monthly,1.0,antarctica,m,2006-01-16 12:00:00,2100-12-16 12:00:00,s3://ncar-cesm-lens/ice_sh/monthly/cesmLE-RCP85-hi.zarr
+FSNO,fraction of ground covered by snow,lnd,RCP85,monthly,1.0,global_land,unitless,2006-01-16 12:00:00,2100-12-16 12:00:00,s3://ncar-cesm-lens/lnd/monthly/cesmLE-RCP85-FSNO.zarr
+H2OSNO,snow depth (liquid water),lnd,RCP85,monthly,1.0,global_land,mm,2006-01-16 12:00:00,2100-12-16 12:00:00,s3://ncar-cesm-lens/lnd/monthly/cesmLE-RCP85-H2OSNO.zarr
+DIC,dissolved inorganic carbon,ocn,RCP85,monthly,60.0,global_ocean,mmol/m^3,2006-01-16 12:00:00,2100-12-16 12:00:00,s3://ncar-cesm-lens/ocn/monthly/cesmLE-RCP85-DIC.zarr
+DOC,dissolved organic carbon,ocn,RCP85,monthly,60.0,global_ocean,mmol/m^3,2006-01-16 12:00:00,2100-12-16 12:00:00,s3://ncar-cesm-lens/ocn/monthly/cesmLE-RCP85-DOC.zarr
