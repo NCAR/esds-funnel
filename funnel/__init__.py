@@ -5,7 +5,7 @@ from pkg_resources import DistributionNotFound, get_distribution
 
 from .cache import CacheStore
 from .registry import registry
-from .serializers import pick_serializer, serializers
+from .serializers import pick_serializer
 
 try:
     __version__ = get_distribution('esds-funnel').version
