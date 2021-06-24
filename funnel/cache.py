@@ -34,9 +34,6 @@ class CacheStore:
         self.raw_path = self.fs._strip_protocol(self.path)
         self.protocol = self.fs.protocol
 
-    def __getitem__(self, key: str, *args, **kwargs):
-        return self.get(key, *args, **kwargs)
-
     def _construct_item_path(self, key):
         return f'{self.path}/{key}'
 
