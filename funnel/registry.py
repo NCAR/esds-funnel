@@ -3,6 +3,8 @@ import typing
 
 import catalogue
 
+from .serializers import serializers as default_serializers
+
 # Use typing_extensions for Python versions < 3.8
 if sys.version_info < (3, 8):
     from typing_extensions import Protocol
@@ -19,7 +21,7 @@ class Decorator(Protocol):
 
 
 class registry:
-    derived_variable: Decorator = catalogue.create('funnel', 'derived_variable', entry_points=True)
+    serializers: Decorator = default_serializers
 
     @classmethod
     def create(cls, registry_name: str, entry_points: bool = False) -> None:
