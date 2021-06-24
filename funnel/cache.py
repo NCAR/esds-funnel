@@ -46,16 +46,16 @@ class CacheStore:
             serializer = serializers.get(serializer)()
             return serializer.load(self._construct_item_path(key), **serializer_kwargs)
 
-    def __contains__(self, key: str):
+    def __contains__(self, key: str) -> bool:
         return key in self.mapper
 
-    def keys(self):
+    def keys(self) -> typing.List[str]:
         return list(self.mapper.keys())
 
-    def delete(self, key, **kwargs):
+    def delete(self, key, **kwargs) -> None:
         self.fs.delete(key, **kwargs)
 
-    def put(self, key, value, serializer: str = 'auto', **serializer_kwargs):
+    def put(self, key, value, serializer: str = 'auto', **serializer_kwargs) -> None:
         if not self.readonly:
             method = getattr(self, f'_put_{self.on_duplicate_key.value}')
             serializer = pick_serializer(value) if serializer == 'auto' else serializer
