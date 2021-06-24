@@ -10,6 +10,7 @@ import funnel
         (['foo', 'bar'], 'joblib'),
         ({'foo': 'bar'}, 'joblib'),
         (xr.DataArray([1, 2]), 'xarray.netcdf'),
+        (xr.DataArray([1, 2]).to_dataset(name='test'), 'xarray.netcdf'),
     ],
 )
 def test_default_serializer(value, expected_serializer):
