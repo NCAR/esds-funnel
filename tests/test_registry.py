@@ -1,5 +1,6 @@
 from typing import Callable
 
+import catalogue
 import pytest
 
 import funnel
@@ -28,10 +29,20 @@ def test_get_error():
     with pytest.raises(ValueError):
         funnel.registry.get('my_registry', 'my_func')
 
-    with pytest.raises(ValueError):
+    with pytest.raises(catalogue.RegistryError):
         funnel.registry.get('serializers', 'my_func')
 
 
 def test_create_error():
     with pytest.raises(ValueError):
         funnel.registry.create('serializers')
+
+
+def test_create():
+    funnel.registry.create('my_registry')
+
+    @funnel.registry.my_registry.register('test')
+    def my_func():
+        return
+
+    assert funnel.registry.has('my_registry', 'test')
