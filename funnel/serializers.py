@@ -6,8 +6,6 @@ import xarray as xr
 
 from .registry import registry
 
-registry.create('serializers', entry_points=True)
-
 
 @pydantic.dataclasses.dataclass
 class Serializer:

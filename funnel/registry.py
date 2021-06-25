@@ -1,3 +1,4 @@
+# Adapted from https://github.com/explosion/thinc
 import sys
 import typing
 
@@ -19,6 +20,8 @@ class Decorator(Protocol):
 
 
 class registry:
+    serializers: Decorator = catalogue.create('funnel', 'serializers', entry_points=True)
+
     @classmethod
     def create(cls, registry_name: str, entry_points: bool = False) -> None:
         """Create a new custom registry."""
