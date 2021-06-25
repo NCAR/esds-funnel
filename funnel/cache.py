@@ -5,7 +5,8 @@ import typing
 import fsspec
 import pydantic
 
-from .serializers import Serializer, pick_serializer, serializers
+from .registry import registry
+from .serializers import Serializer, pick_serializer
 
 
 class DuplicateKeyEnum(str, enum.Enum):
@@ -43,7 +44,7 @@ class CacheStore:
             return json.loads(data)
 
         else:
-            serializer = serializers.get(serializer)()
+            serializer = registry.serializers.get(serializer)()
             return serializer.load(self._construct_item_path(key), **serializer_kwargs)
 
     def __contains__(self, key: str) -> bool:
@@ -59,7 +60,7 @@ class CacheStore:
         if not self.readonly:
             method = getattr(self, f'_put_{self.on_duplicate_key.value}')
             serializer = pick_serializer(value) if serializer == 'auto' else serializer
-            serializer = serializers.get(serializer)()
+            serializer = registry.serializers.get(serializer)()
             return method(key, value, serializer, **serializer_kwargs)
 
     def _put_skip(self, key, value, serializer: Serializer, **serializer_kwargs):
