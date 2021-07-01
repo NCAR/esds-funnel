@@ -2,7 +2,6 @@ dask[complete]
 xarray
 zarr
 netcdf4
-intake-esm>=2020.5.1
 pydantic
 catalogue
 fsspec
