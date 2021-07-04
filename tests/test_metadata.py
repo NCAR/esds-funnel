@@ -1,18 +1,25 @@
 import pandas as pd
 import pytest
+import xarray as xr
 
-from funnel import MemoryMetadataStore
+from funnel import CacheStore, MemoryMetadataStore
+
+ds = xr.tutorial.open_dataset('tiny')
 
 
+@pytest.mark.parametrize('cache_store', ['.'])
 @pytest.mark.parametrize(
-    'key, value', [('test', {'serializer': 'xarray.netcdf', 'load_kwargs': {}, 'dump_kwargs': {}})]
+    'key, value, serializer, dump_kwargs',
+    [
+        ('test', {'a': [1, 2, 3], 'b': 'foo'}, 'auto', {}),
+        ('tiny', ds, 'xarray.netcdf', {}),
+        ('tiny_zarr', ds, 'xarray.zarr', {'mode': 'w'}),
+    ],
 )
-def test_memory_metadata_store(key, value):
-    ms = MemoryMetadataStore()
+def test_memory_metadata_store(tmp_path, cache_store, key, value, serializer, dump_kwargs):
+
+    ms = MemoryMetadataStore(CacheStore(str(tmp_path / cache_store)))
     assert isinstance(ms.df, pd.DataFrame)
-
-    ms.put(key, value)
+    ms.put(key, value, serializer, **dump_kwargs)
     results = ms.get(key)
-    assert isinstance(results, pd.Series)
-
-    assert results.to_dict() == value
+    assert type(results) == type(value)
