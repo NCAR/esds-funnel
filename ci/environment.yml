@@ -10,6 +10,7 @@ dependencies:
   - joblib
   - netcdf4
   - pip
+  - pooch
   - pydantic
   - pytest
   - pytest-cov
