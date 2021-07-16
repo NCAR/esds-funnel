@@ -1,7 +1,7 @@
 import pandas as pd
 import pydantic
 
-from funnel.metadata import BaseMetadataStore
+from ..metadata import BaseMetadataStore
 
 
 @pydantic.dataclasses.dataclass
