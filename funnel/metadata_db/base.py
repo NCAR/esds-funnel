@@ -4,7 +4,7 @@ import typing
 import pandas as pd
 import pydantic
 
-from .cache import CacheStore
+from ..cache import CacheStore
 
 
 @pydantic.dataclasses.dataclass
@@ -18,14 +18,7 @@ class BaseMetadataStore(abc.ABC):
     """
 
     cache_store: CacheStore
-    readonly: bool = False
-    index: str = 'key'
-    required_columns: typing.ClassVar[typing.List[str]] = [
-        'key',
-        'serializer',
-        'load_kwargs',
-        'dump_kwargs',
-    ]
+    readonly: bool
 
     @abc.abstractmethod
     def put(self, key, value, **dump_kwargs) -> None:
@@ -39,6 +32,15 @@ class BaseMetadataStore(abc.ABC):
 @pydantic.dataclasses.dataclass
 class MemoryMetadataStore(BaseMetadataStore):
     """Records metadata information in an in-memory pandas DataFrame."""
+
+    readonly: bool = False
+    index: str = 'key'
+    required_columns: typing.ClassVar[typing.List[str]] = [
+        'key',
+        'serializer',
+        'load_kwargs',
+        'dump_kwargs',
+    ]
 
     def __post_init_post_parse__(self):
         self.df = pd.DataFrame(columns=self.required_columns).set_index(self.index)
