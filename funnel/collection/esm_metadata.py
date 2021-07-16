@@ -5,7 +5,7 @@ from funnel.metadata import BaseMetadataStore
 
 
 @pydantic.dataclasses.dataclass
-class EsmMetdataStore(BaseMetadataStore):
+class ESMMetdataStore(BaseMetadataStore):
     def __post_init_post_parse__(self):
         self.df = pd.DataFrame(
             columns=[
