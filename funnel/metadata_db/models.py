@@ -1,5 +1,5 @@
 from sqlalchemy import JSON, TIMESTAMP, Column, String
-from sqlalchemy.ext.declarative.api import declarative_base
+from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 

@@ -18,7 +18,7 @@ dependencies:
   - pytest-xdist
   - xarray
   - zarr
-  - sqlalchemy<1.4
+  - sqlalchemy>=1.4.21
   - sqlalchemy-utils
   - pip:
       - -r ../requirements.txt

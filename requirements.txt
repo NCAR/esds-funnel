@@ -7,3 +7,4 @@ catalogue
 fsspec
 joblib
 sqlalchemy-utils
+sqlalchemy>=1.4.21
