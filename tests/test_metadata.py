@@ -7,7 +7,6 @@ ds = xr.tutorial.open_dataset('tiny')
 
 
 @pytest.mark.parametrize('metadata_store', [MemoryMetadataStore, SQLMetadataStore])
-@pytest.mark.parametrize('cache_store', ['.'])
 @pytest.mark.parametrize(
     'key, value, serializer, dump_kwargs',
     [
@@ -16,11 +15,9 @@ ds = xr.tutorial.open_dataset('tiny')
         ('tiny_zarr', ds, 'xarray.zarr', {'mode': 'w'}),
     ],
 )
-def test_memory_metadata_store(
-    tmp_path, metadata_store, cache_store, key, value, serializer, dump_kwargs
-):
+def test_memory_metadata_store(metadata_store, key, value, serializer, dump_kwargs):
 
-    ms = metadata_store(CacheStore(str(tmp_path / cache_store)))
+    ms = metadata_store(CacheStore())
     ms.put(key, value, serializer, dump_kwargs=dump_kwargs)
     results = ms.get(key)
     assert type(results) == type(value)
