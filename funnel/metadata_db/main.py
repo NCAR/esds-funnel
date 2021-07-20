@@ -1,4 +1,5 @@
 import abc
+import tempfile
 import typing
 
 import pandas as pd
@@ -94,7 +95,7 @@ class SQLMetadataStore(BaseMetadataStore):
     A metadata store that uses SQLAlchemy to store metadata.
     """
 
-    database_url: str = 'sqlite:///./sql_app.db'
+    database_url: str = f'sqlite:///{tempfile.gettempdir()}/funnel.db'
     readonly: bool = False
 
     def __post_init_post_parse__(self):

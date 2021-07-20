@@ -1,5 +1,6 @@
 import enum
 import json
+import tempfile
 import typing
 
 import fsspec
@@ -24,7 +25,7 @@ class CacheStore:
     Some backends may require other dependencies. For example to work with S3 cache store, s3fs is required.
     """
 
-    path: str
+    path: str = tempfile.gettempdir()
     readonly: bool = False
     on_duplicate_key: DuplicateKeyEnum = 'skip'
     storage_options: typing.Dict = None
