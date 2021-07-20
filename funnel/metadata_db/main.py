@@ -32,6 +32,10 @@ class BaseMetadataStore(abc.ABC):
     def get(self, key, **load_kwargs) -> typing.Any:
         ...
 
+    @abc.abstractmethod
+    def __contains__(self, key: str) -> bool:
+        ...
+
 
 @pydantic.dataclasses.dataclass
 class MemoryMetadataStore(BaseMetadataStore):
@@ -65,7 +69,8 @@ class MemoryMetadataStore(BaseMetadataStore):
         **dump_kwargs : dict
         """
         artifact = self.cache_store.put(key, value, serializer, dump_kwargs=dump_kwargs)
-        self.df.loc[key] = artifact.dict()
+        if key not in self:
+            self.df.loc[key] = artifact.dict()
 
     def get(self, key: str, **load_kwargs) -> typing.Any:
         """Returns the value for the key if the key is in both the metadata and cache stores.
@@ -78,6 +83,9 @@ class MemoryMetadataStore(BaseMetadataStore):
         x = self.df.loc[key]
         _load_kwargs = load_kwargs or x.load_kwargs
         return self.cache_store.get(key, x.serializer, **_load_kwargs)
+
+    def __contains__(self, key: str) -> bool:
+        return key in self.df.index
 
 
 @pydantic.dataclasses.dataclass
@@ -96,6 +104,10 @@ class SQLMetadataStore(BaseMetadataStore):
         self._engine = create_engine(self.database_url, connect_args={'check_same_thread': False})
         models.Base.metadata.create_all(self._engine)
         self._session_factory = sessionmaker(bind=self._engine, autocommit=False, autoflush=False)
+
+    def __contains__(self, key: str) -> bool:
+        with self._session_factory() as session:
+            return bool(session.query(models.Artifact).filter_by(key=key).first())
 
     def get(self, key: str, **load_kwargs):
         """
@@ -124,7 +136,8 @@ class SQLMetadataStore(BaseMetadataStore):
         )
         db_artifact = models.Artifact(**artifact.dict())
         with self._session_factory() as session:
-            session.add(db_artifact)
-            session.commit()
-            session.refresh(db_artifact)
-            return db_artifact
+            if key not in self:
+                session.add(db_artifact)
+                session.commit()
+                session.refresh(db_artifact)
+                return db_artifact
