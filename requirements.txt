@@ -6,3 +6,4 @@ pydantic
 catalogue
 fsspec
 joblib
+sqlalchemy-utils

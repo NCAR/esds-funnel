@@ -5,17 +5,9 @@ import typing
 import fsspec
 import pydantic
 
+from .metadata_db.schemas import Artifact
 from .registry import registry
 from .serializers import Serializer, pick_serializer
-
-
-class AssetReceipt(pydantic.BaseModel):
-    """Holds information about the asset/artifact to be persisted in the cache store"""
-
-    key: str
-    serializer: str
-    dump_kwargs: typing.Dict = {}
-    load_kwargs: typing.Dict = {}
 
 
 class DuplicateKeyEnum(str, enum.Enum):
@@ -67,8 +59,13 @@ class CacheStore:
         self.fs.delete(key, **kwargs)
 
     def put(
-        self, key: str, value, serializer: str = 'auto', **dump_kwargs: typing.Dict
-    ) -> AssetReceipt:
+        self,
+        key: str,
+        value,
+        serializer: str = 'auto',
+        dump_kwargs: typing.Dict = {},
+        custom_fields: typing.Dict = {},
+    ) -> Artifact:
         """Records and serializes key with its corresponding value in the cache store.
 
         Parameters
@@ -77,20 +74,26 @@ class CacheStore:
         value :
         serializer : str
         dump_kwargs : dict
+        custom_fields : dict
 
         Returns
         -------
-        asset_receipt: AssetReceipt
-            an `AssetReceipt` object with corresping asset serialization information
+        artifact : Artifact
+            an `Artifact` object with corresping asset serialization information
 
         """
         if not self.readonly:
             method = getattr(self, f'_put_{self.on_duplicate_key.value}')
             serializer_name = pick_serializer(value) if serializer == 'auto' else serializer
             serializer = registry.serializers.get(serializer_name)()
-            receipt = AssetReceipt(key=key, serializer=serializer_name, dump_kwargs=dump_kwargs)
+            artifact = Artifact(
+                key=key,
+                serializer=serializer_name,
+                dump_kwargs=dump_kwargs,
+                custom_fields=custom_fields,
+            )
             method(key, value, serializer, **dump_kwargs)
-            return receipt
+            return artifact
 
     def _put_skip(self, key, value, serializer: Serializer, **serializer_kwargs) -> None:
         if key not in self:

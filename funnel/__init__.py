@@ -4,7 +4,7 @@
 from pkg_resources import DistributionNotFound, get_distribution
 
 from .cache import CacheStore
-from .metadata_db.base import BaseMetadataStore, MemoryMetadataStore
+from .metadata_db.main import BaseMetadataStore, MemoryMetadataStore, SQLMetadataStore
 from .registry import registry
 from .serializers import pick_serializer
 

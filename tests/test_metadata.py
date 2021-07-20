@@ -20,6 +20,6 @@ def test_memory_metadata_store(tmp_path, cache_store, key, value, serializer, du
 
     ms = MemoryMetadataStore(CacheStore(str(tmp_path / cache_store)))
     assert isinstance(ms.df, pd.DataFrame)
-    ms.put(key, value, serializer, **dump_kwargs)
+    ms.put(key, value, serializer, dump_kwargs=dump_kwargs)
     results = ms.get(key)
     assert type(results) == type(value)
