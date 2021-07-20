@@ -37,6 +37,11 @@ class BaseMetadataStore(abc.ABC):
     def __contains__(self, key: str) -> bool:
         ...
 
+    @property
+    @abc.abstractclassmethod
+    def df(self) -> pd.DataFrame:
+        ...
+
 
 @pydantic.dataclasses.dataclass
 class MemoryMetadataStore(BaseMetadataStore):
@@ -54,7 +59,11 @@ class MemoryMetadataStore(BaseMetadataStore):
             'checksum',
             'created_at',
         ]
-        self.df = pd.DataFrame(columns=self.columns).set_index('key')
+        self._df = pd.DataFrame(columns=self.columns).set_index('key')
+
+    @property
+    def df(self) -> pd.DataFrame:
+        return self._df
 
     def put(
         self, key: str, value, serializer: str = 'auto', dump_kwargs: typing.Optional[dict] = None
@@ -71,7 +80,7 @@ class MemoryMetadataStore(BaseMetadataStore):
         """
         artifact = self.cache_store.put(key, value, serializer, dump_kwargs=dump_kwargs)
         if key not in self:
-            self.df.loc[key] = artifact.dict()
+            self._df.loc[key] = artifact.dict()
 
     def get(self, key: str, **load_kwargs) -> typing.Any:
         """Returns the value for the key if the key is in both the metadata and cache stores.
@@ -81,18 +90,19 @@ class MemoryMetadataStore(BaseMetadataStore):
         key : str
         load_kwargs : dict
         """
-        x = self.df.loc[key]
+        x = self._df.loc[key]
         _load_kwargs = load_kwargs or x.load_kwargs
         return self.cache_store.get(key, x.serializer, **_load_kwargs)
 
     def __contains__(self, key: str) -> bool:
-        return key in self.df.index
+        return key in self._df.index
 
 
 @pydantic.dataclasses.dataclass
 class SQLMetadataStore(BaseMetadataStore):
     """
-    A metadata store that uses SQLAlchemy to store metadata.
+    A metadata store that uses SQLAlchemy to store artifact metadata
+    in a SQL database (PostgreSQL, MySQL, SQLite).
     """
 
     database_url: str = f'sqlite:///{tempfile.gettempdir()}/funnel.db'
@@ -142,3 +152,15 @@ class SQLMetadataStore(BaseMetadataStore):
                 session.commit()
                 session.refresh(db_artifact)
                 return db_artifact
+
+    @property
+    def df(self):
+        """
+        Return a pandas DataFrame of the metadata stored in the database.
+        """
+        with self._session_factory() as session:
+            return pd.read_sql_table(
+                models.Artifact.__tablename__,
+                con=session.connection(),
+                index_col=models.Artifact.key.name,
+            )

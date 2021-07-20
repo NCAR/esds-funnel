@@ -1,3 +1,4 @@
+import pandas as pd
 import pytest
 import xarray as xr
 
@@ -18,6 +19,7 @@ ds = xr.tutorial.open_dataset('tiny')
 def test_memory_metadata_store(metadata_store, key, value, serializer, dump_kwargs):
 
     ms = metadata_store(CacheStore())
+    assert isinstance(ms.df, pd.DataFrame)
     ms.put(key, value, serializer, dump_kwargs=dump_kwargs)
     results = ms.get(key)
     assert type(results) == type(value)
