@@ -19,7 +19,14 @@ def test_has(registry_name, func_name, expected):
 
 
 @pytest.mark.parametrize(
-    'registry_name,func_name', [('serializers', 'xarray.netcdf'), ('serializers', 'joblib')]
+    'registry_name,func_name',
+    [
+        ('serializers', 'xarray.netcdf'),
+        ('serializers', 'xarray.zarr'),
+        ('serializers', 'joblib'),
+        ('metadata_store', 'memory'),
+        ('metadata_store', 'sql'),
+    ],
 )
 def test_get(registry_name, func_name):
     assert isinstance(funnel.registry.get(registry_name, func_name), Callable)
