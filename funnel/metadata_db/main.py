@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists
 
-from ..cache import CacheStore, DuplicateKeyEnum
+from ..cache import CacheStore
 from ..registry import registry
 from . import models, schemas
 
@@ -168,37 +168,12 @@ class SQLMetadataStore(BaseMetadataStore):
 
 
 @registry.metadata_store('memory')
-def memory_metadata_store(
-    cache_store: str,
-    *,
-    cache_store_readonly: bool = False,
-    storage_options: dict = None,
-    on_duplicate_key: DuplicateKeyEnum = 'skip',
-    database_readonly: bool = False,
-):
-    cache_store = CacheStore(
-        cache_store,
-        readonly=cache_store_readonly,
-        on_duplicate_key=on_duplicate_key,
-        storage_options=storage_options,
-    )
-    return MemoryMetadataStore(cache_store, readonly=database_readonly)
+def memory_metadata_store(cache_store_options: dict, metadata_store_options: dict):
+    cache_store = CacheStore(**cache_store_options)
+    return MemoryMetadataStore(cache_store, **metadata_store_options)
 
 
 @registry.metadata_store('sql')
-def sql_metadata_store(
-    cache_store: str,
-    *,
-    cache_store_readonly: bool = False,
-    storage_options: dict = None,
-    on_duplicate_key: DuplicateKeyEnum = 'skip',
-    database_readonly: bool = False,
-    database_url: str = None,
-):
-    cache_store = CacheStore(
-        cache_store,
-        readonly=cache_store_readonly,
-        on_duplicate_key=on_duplicate_key,
-        storage_options=storage_options,
-    )
-    return SQLMetadataStore(cache_store, database_url=database_url, readonly=database_readonly)
+def sql_metadata_store(cache_store_options: dict, metadata_store_options: dict):
+    cache_store = CacheStore(**cache_store_options)
+    return SQLMetadataStore(cache_store, **metadata_store_options)
