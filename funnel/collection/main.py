@@ -69,21 +69,8 @@ class Collection:
                         # read in the dataset - add to the dataset dict
                         df = subset_catalog[catalog_key]
 
-                        # Update various kwargs for reading in data
-                        if 'zarr_kwargs' in self.kwargs:
-                            df.zarr_kwargs = self.kwargs['zarr_kwargs']
-
-                        if 'cdf_kwargs' in self.kwargs:
-                            df.cdf_kwargs = self.kwargs['cdf_kwargs']
-
-                        if 'storage_options' in self.kwargs:
-                            df.storage_options = self.kwargs['storage_options']
-
-                        if 'preprocess' in self.kwargs:
-                            df.preprocess = self.kwargs['preprocess']
-
                         # Open the dataset using the prescribed key
-                        ds = self.apply_operators(df.to_dask())
+                        ds = self.apply_operators(df(**self.kwargs).to_dask())
 
                         # Add this dataset to the dictionary of datasets
                         dsets[catalog_key] = ds
