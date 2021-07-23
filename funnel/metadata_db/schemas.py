@@ -18,10 +18,7 @@ class ArtifactBase(pydantic.BaseModel):
     created_at: datetime.datetime = datetime.datetime.utcnow()
 
 
-class ArtifactCreate(ArtifactBase):
-    ...
-
-
 class Artifact(ArtifactBase):
     class Config:
         orm_mode = True
+        validate_assignment = True
