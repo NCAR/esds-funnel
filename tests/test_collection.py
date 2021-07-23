@@ -1,8 +1,11 @@
-import pytest
-import xarray as xr
+import os
+import pathlib
 
-from funnel import CacheStore, SQLMetadataStore
-from funnel.collection import Collection
+import pytest
+
+from funnel import Collection
+
+root_directory = pathlib.Path(os.path.abspath(os.path.dirname(__file__))).parent
 
 
 def subset_time(ds, **kwargs):
@@ -22,21 +25,21 @@ def ensemble_mean(ds, **kwargs):
 
 
 @pytest.mark.parametrize(
-    'metadata_store, collection_name, esm_collection_json, esm_collection_query, operators, operator_kwargs, serializer, kwargs',
+    'collection_name, esm_collection_json, esm_collection_query, operators, operator_kwargs, serializer, kwargs',
     [
-        SQLMetadataStore(CacheStore(path='testdb'), database_url='sqlite:///./funnel_test.db'),
-        'yearly_ensemble_mean',
-        '../../data/cesm-le-test-catalog.json',
-        dict(component='atm'),
-        [subset_time, choose_boulder, yearly_mean, ensemble_mean],
-        [{}, {}, {}],
-        'xarray.zarr',
-        {'zarr_kwargs': {'consolidated': True}, 'storage_options': {'anon': True}},
+        (
+            'yearly_ensemble_mean',
+            f'{root_directory}/data/cesm-le-test-catalog.json',
+            dict(component='atm'),
+            [subset_time, choose_boulder, yearly_mean, ensemble_mean],
+            [{}, {}, {}, {}],
+            'xarray.zarr',
+            {'zarr_kwargs': {'consolidated': True}, 'storage_options': {'anon': True}},
+        )
     ],
 )
-@pytest.mark.parametrize('variable', ['FLNS'])
+@pytest.mark.parametrize('variable', ['FLNS', 'FLNSC'])
 def test_get_collection_object_1var(
-    metadata_store,
     collection_name,
     esm_collection_json,
     esm_collection_query,
@@ -48,54 +51,13 @@ def test_get_collection_object_1var(
 ):
     """Test collection for one variable"""
     c = Collection(
-        metadata_store,
         collection_name,
         esm_collection_json,
         esm_collection_query,
         operators,
         operator_kwargs,
         serializer,
-        kwargs,
+        kwargs=kwargs,
     )
 
-    assert isinstance(c.to_dataset_dict(variable=variable), xr.Dataset())
-
-
-@pytest.mark.parametrize(
-    'metadata_store, collection_name, esm_collection_json, esm_collection_query, operators, operator_kwargs, serializer, kwargs',
-    [
-        SQLMetadataStore(CacheStore(path='testdb'), database_url='sqlite:///./funnel_test.db'),
-        'yearly_ensemble_mean',
-        '../../data/cesm-le-test-catalog.json',
-        dict(component='atm'),
-        [subset_time, choose_boulder, yearly_mean, ensemble_mean],
-        [{}, {}, {}],
-        'xarray.zarr',
-        {'zarr_kwargs': {'consolidated': True}, 'storage_options': {'anon': True}},
-    ],
-)
-@pytest.mark.parametrize('variable', ['FLNS', 'FLNSC'])
-def test_get_collection_object_2var(
-    metadata_store,
-    collection_name,
-    esm_collection_json,
-    esm_collection_query,
-    operators,
-    operator_kwargs,
-    serializer,
-    kwargs,
-    variable,
-):
-    """Test collection for two variables"""
-    c = Collection(
-        metadata_store,
-        collection_name,
-        esm_collection_json,
-        esm_collection_query,
-        operators,
-        operator_kwargs,
-        serializer,
-        kwargs,
-    )
-
-    assert isinstance(c.to_dataset_dict(variable=variable), xr.Dataset())
+    assert isinstance(c.to_dataset_dict(variable=variable), dict)

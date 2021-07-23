@@ -1,11 +1,13 @@
 # Lets you tokenize a lazy object
+import typing
 import warnings
 
 import intake
 import pydantic
 from dask.base import tokenize
 
-from funnel import BaseMetadataStore
+from ..config import config as default_config
+from ..metadata_db.main import MemoryMetadataStore, SQLMetadataStore
 
 
 class Origin_Dict(pydantic.BaseModel):
@@ -21,18 +23,19 @@ class Origin_Dict(pydantic.BaseModel):
 @pydantic.dataclasses.dataclass
 class Collection:
     # rename metadatastore - cache_database
-    metadata_store: BaseMetadataStore
     collection_name: str
     esm_collection_json: str
     esm_collection_query: dict
     operators: list = None
     operator_kwargs: list = None
     serializer: str = 'xarray.zarr'
+    metadata_store: typing.Union[MemoryMetadataStore, SQLMetadataStore] = None
     kwargs: dict = None
 
     def __post_init_post_parse__(self):
         self.operators = self.operators or []
         self.operator_kwargs = self.operator_kwargs or [{}]
+        self.metadata_store = default_config.metadata_store or self.metadata_store
         self.origins_dict = Origin_Dict(
             collection_name=self.collection_name,
             esm_collection_json=self.esm_collection_json,
@@ -42,7 +45,6 @@ class Collection:
         ).dict()
         self.catalog = intake.open_esm_datastore(self.esm_collection_json)
         self.base_variables = set(self.catalog.df.variable)
-        self.catalog_cache = BaseMetadataStore
         self.variable = self.esm_collection_query.get('variable', None)
 
     def to_dataset_dict(self, variable, compute=False):
