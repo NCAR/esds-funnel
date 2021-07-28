@@ -1,0 +1,10 @@
+cache_store:
+  path: $TMPDIR/funnel/cache/
+  readonly: false
+  on_duplicate_key: skip
+  storage_options:
+
+metadata_store:
+  type: sql # memory or sql
+  readonly: false
+  database_url: sqlite:///$HOME/.config/funnel/funnel.db

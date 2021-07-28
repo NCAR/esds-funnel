@@ -9,6 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists
 
 from ..cache import CacheStore
+from ..registry import registry
 from . import models, schemas
 
 
@@ -164,3 +165,15 @@ class SQLMetadataStore(BaseMetadataStore):
                 con=session.connection(),
                 index_col=models.Artifact.key.name,
             )
+
+
+@registry.metadata_store('memory')
+def memory_metadata_store(cache_store_options: dict, metadata_store_options: dict):
+    cache_store = CacheStore(**cache_store_options)
+    return MemoryMetadataStore(cache_store, **metadata_store_options)
+
+
+@registry.metadata_store('sql')
+def sql_metadata_store(cache_store_options: dict, metadata_store_options: dict):
+    cache_store = CacheStore(**cache_store_options)
+    return SQLMetadataStore(cache_store, **metadata_store_options)

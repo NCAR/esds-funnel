@@ -36,6 +36,11 @@ class CacheStore:
         self.fs = self.mapper.fs
         self.raw_path = self.fs._strip_protocol(self.path)
         self.protocol = self.fs.protocol
+        self._ensure_dir(self.raw_path)
+
+    def _ensure_dir(self, key: str) -> None:
+        if not self.fs.exists(key):
+            self.fs.makedirs(key, exist_ok=True)
 
     def _construct_item_path(self, key) -> str:
         return f'{self.path}/{key}'
