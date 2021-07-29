@@ -2,7 +2,7 @@ import warnings
 from typing import Callable
 
 import pydantic
-from config import derived_variable_registry
+from funnel.collection.registry import derived_variable_registry, query_dependent_operator_registry
 from toolz import curry
 
 
@@ -29,7 +29,7 @@ class Derived_Variable(object):
 
 
 @curry
-def register_derived_var(func, varname, dependent_vars):
+def register_derived_variable(func, varname, dependent_vars):
     """register a function for computing derived variables"""
     if varname in derived_variable_registry:
         warnings.warn(f'overwriting derived variable "{varname}" definition')
@@ -38,4 +38,18 @@ def register_derived_var(func, varname, dependent_vars):
         dependent_vars,
         func,
     )
+    return func
+
+@curry
+def register_query_dependent_operator(func, query_keys):
+    """register a function for computing derived variables"""
+    func_hash = hash(func)
+    if func_hash in query_dependent_operator_registry:
+        warnings.warn(
+            f'overwriting query dependent operator "{func.__name__}" definition'
+        )
+
+    query_dependent_operator_registry[func_hash] = query_dependent_op(
+        func, query_keys,
+    )    
     return func
