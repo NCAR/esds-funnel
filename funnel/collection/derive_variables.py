@@ -2,8 +2,9 @@ import warnings
 from typing import Callable
 
 import pydantic
-from funnel.collection.registry import derived_variable_registry, query_dependent_operator_registry
 from toolz import curry
+
+from funnel.collection.registry import derived_variable_registry, query_dependent_operator_registry
 
 
 @pydantic.dataclasses.dataclass
@@ -28,6 +29,21 @@ class Derived_Variable(object):
             raise ValueError(f'Variables missing: {missing_var}')
 
 
+class Query_Dependent_Operator(object):
+    """
+    Support calling functions that depend on the values of the query.
+    """
+
+    def __init__(self, func, query_keys):
+        self._callable = func
+        self._query_keys = query_keys
+
+    def __call__(self, ds, query_dict, **kwargs):
+        """call function with query keys added to keyword args"""
+        kwargs.update({k: query_dict[k] for k in self._query_keys})
+        return self._callable(ds, **kwargs)
+
+
 @curry
 def register_derived_variable(func, varname, dependent_vars):
     """register a function for computing derived variables"""
@@ -40,16 +56,16 @@ def register_derived_variable(func, varname, dependent_vars):
     )
     return func
 
+
 @curry
 def register_query_dependent_operator(func, query_keys):
     """register a function for computing derived variables"""
     func_hash = hash(func)
     if func_hash in query_dependent_operator_registry:
-        warnings.warn(
-            f'overwriting query dependent operator "{func.__name__}" definition'
-        )
+        warnings.warn(f'overwriting query dependent operator "{func.__name__}" definition')
 
-    query_dependent_operator_registry[func_hash] = query_dependent_op(
-        func, query_keys,
-    )    
+    query_dependent_operator_registry[func_hash] = Query_Dependent_Operator(
+        func,
+        query_keys,
+    )
     return func

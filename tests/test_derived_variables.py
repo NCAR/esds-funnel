@@ -1,5 +1,7 @@
-from funnel.collection.derive_variables import register_derived_variable, derived_variable_registry
 import pytest
+
+from funnel.collection.derive_variables import derived_variable_registry, register_derived_variable
+
 
 @pytest.mark.parametrize('varname, dependent_var', [('air_temperature_degC', 'air')])
 def test_registry(varname, dependent_var):
@@ -16,5 +18,5 @@ def test_registry(varname, dependent_var):
             ds.air_temperature_degC.attrs['coordinates'] = ds.air.attrs['coordinates']
             ds.air_temperature_degC.encoding = ds.air.encoding
         return ds.drop(['air'])
-    
+
     assert len(derived_variable_registry) == 1
