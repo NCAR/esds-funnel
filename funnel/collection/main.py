@@ -44,14 +44,14 @@ class Collection:
             operator_kwargs=self.operator_kwargs,
         ).dict()
         self.catalog = intake.open_esm_datastore(self.esm_collection_json)
-        self.variable_column_name = self.catalog.col.aggregation_info.variable_column_name
+        self.variable_column_name = self.catalog.aggregation_info.variable_column_name
         self.base_variables = set(self.catalog.df.variable)
         self.variable = self.esm_collection_query.get(self.variable_column_name, None)
 
     def to_dataset_dict(self, variable, compute=False):
         """Returns a dictionary of datasets similar to intake-esm"""
         dsets = {}
-        if not isinstance(variable, list):
+        if isinstance(variable, str):
             variable = [variable]
 
         if isinstance(variable, list):
@@ -85,7 +85,7 @@ class Collection:
                             individual_key,
                             dsets[catalog_key],
                             self.serializer,
-                            custom_fields=self.origins_dict.dict(),
+                            custom_fields=self.origins_dict,
                         )
 
         return dsets
