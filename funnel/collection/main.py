@@ -10,7 +10,7 @@ from ..config import config as default_config
 from ..metadata_db.main import MemoryMetadataStore, SQLMetadataStore
 
 
-class Origin_Dict(pydantic.BaseModel):
+class OriginDict(pydantic.BaseModel):
     collection_name: str
     esm_collection_json: str
     esm_collection_query: dict
@@ -36,7 +36,7 @@ class Collection:
         self.operators = self.operators or []
         self.operator_kwargs = self.operator_kwargs or [{}]
         self.metadata_store = default_config.metadata_store or self.metadata_store
-        self.origins_dict = Origin_Dict(
+        self.origins_dict = OriginDict(
             collection_name=self.collection_name,
             esm_collection_json=self.esm_collection_json,
             esm_collection_query=self.esm_collection_query,
@@ -76,7 +76,7 @@ class Collection:
                         dsets[catalog_key] = ds
 
                         # Add this to the database
-                        if (ds.nbytes * 1e-6) > 1:
+                        if ds.nbytes > 1000000:
                             warnings.warn(
                                 f'Warning: Dataset you are saving is larger than 1 GB \n Total size:{ds.nbytes * 1e-6} GB'
                             )
