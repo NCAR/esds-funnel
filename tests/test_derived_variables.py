@@ -29,7 +29,7 @@ def test_registry(varname, dependent_var):
         if 'coordinates' in ds.air.attrs:
             ds.air_temperature_degC.attrs['coordinates'] = ds.air.attrs['coordinates']
             ds.air_temperature_degC.encoding = ds.air.encoding
-        return ds.drop(['air'])
+        return ds.drop_vars(['air'])
 
     assert len(derived_variable_registry) == 1
 
