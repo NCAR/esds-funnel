@@ -20,5 +20,6 @@ dependencies:
   - zarr
   - sqlalchemy>=1.4.21
   - sqlalchemy-utils
+  - s3fs
   - pip:
       - -r ../requirements.txt
