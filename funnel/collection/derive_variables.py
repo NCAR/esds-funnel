@@ -50,7 +50,7 @@ def register_derived_variable(func, varname, dependent_vars):
     if varname in derived_variable_registry:
         warnings.warn(f'overwriting derived variable "{varname}" definition')
 
-    derived_variable_registry[varname] = Derived_Variable(
+    derived_variable_registry[varname] = DerivedVariable(
         dependent_vars,
         func,
     )
