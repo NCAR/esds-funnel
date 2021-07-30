@@ -1,20 +1,20 @@
 import warnings
-from typing import Callable
+from typing import Callable, List
 
 import pydantic
 from toolz import curry
 
-from funnel.collection.registry import derived_variable_registry, query_dependent_operator_registry
+from .registry import derived_variable_registry, query_dependent_operator_registry
 
 
 @pydantic.dataclasses.dataclass
-class Derived_Variable(object):
+class DerivedVariable:
     """
     Support computation of variables that depend on multiple variables,
     i.e., "derived vars"
     """
 
-    dependent_vars: list
+    dependent_vars: List[str]
     func: Callable
 
     def __call__(self, ds, **kwargs):
@@ -29,7 +29,7 @@ class Derived_Variable(object):
             raise ValueError(f'Variables missing: {missing_var}')
 
 
-class Query_Dependent_Operator(object):
+class QueryDependentOperator:
     """
     Support calling functions that depend on the values of the query.
     """
@@ -64,7 +64,7 @@ def register_query_dependent_operator(func, query_keys):
     if func_hash in query_dependent_operator_registry:
         warnings.warn(f'overwriting query dependent operator "{func.__name__}" definition')
 
-    query_dependent_operator_registry[func_hash] = Query_Dependent_Operator(
+    query_dependent_operator_registry[func_hash] = QueryDependentOperator(
         func,
         query_keys,
     )
