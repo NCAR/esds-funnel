@@ -50,7 +50,7 @@ class Collection:
     def to_dataset_dict(self, variable, compute=False):
         """Returns a dictionary of datasets similar to intake-esm"""
         dsets = {}
-        if type(variable) != list:
+        if not isinstance(variable, list):
             variable = list(variable)
 
         if isinstance(variable, list):
