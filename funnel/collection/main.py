@@ -54,7 +54,7 @@ class Collection:
         if isinstance(variable, str):
             variable = [variable]
 
-        elif isinstance(variable, list):
+        elif isinstance(variable, (list, tuple)):
             for v in variable:
                 individual_query = self.esm_collection_query.copy()
                 individual_query['variable'] = v
@@ -88,7 +88,7 @@ class Collection:
                             custom_fields=self.origins_dict,
                         )
         else:
-            warnings.warn('Variable must be a string or list')
+            warnings.warn('Variable must be a string, list, or tuple')
 
         return dsets
 
