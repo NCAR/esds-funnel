@@ -88,7 +88,9 @@ class Collection:
                             custom_fields=self.origins_dict,
                         )
         else:
-            raise TypeError(f'Found `variable` to be an {type(variable)} type. `variable` must be a string, list, or tuple'. )
+            raise TypeError(
+                f'Found `variable` to be an {type(variable)} type. `variable` must be a string, list, or tuple'
+            )
 
         return dsets
 
