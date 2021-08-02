@@ -50,7 +50,7 @@ class Collection:
         self.base_variables = set(self.catalog.df.variable)
         self.variable = self.esm_collection_query.get(self.variable_column_name, None)
 
-    def to_dataset_dict(self, variable, compute=False):
+    def to_dataset_dict(self, variable):
         """Returns a dictionary of datasets similar to intake-esm"""
         dsets = {}
         if isinstance(variable, str):
@@ -68,10 +68,10 @@ class Collection:
             if (v not in self.base_variables) and (v in derived_variable_registry):
                 self.origins_dict.update(derived_variable=True)
                 derived_var = derived_variable_registry[v]
-                individual_query['variable'] = derived_var.dependent_vars
+                individual_query[self.variable_column_name] = derived_var.dependent_vars
 
             elif v in self.base_variables:
-                individual_query['variable'] = v
+                individual_query[self.variable_column_name] = v
 
             else:
                 raise ValueError(f'{v} not found in base variables or derived variables')
