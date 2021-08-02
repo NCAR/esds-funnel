@@ -88,7 +88,7 @@ class Collection:
                             custom_fields=self.origins_dict,
                         )
         else:
-            warnings.warn('Variable must be a string, list, or tuple')
+            raise Exception('Variable must be a string, list, or tuple')
 
         return dsets
 
