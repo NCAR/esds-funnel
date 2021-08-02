@@ -8,6 +8,7 @@ from dask.base import tokenize
 
 from ..config import config as default_config
 from ..metadata_db.main import MemoryMetadataStore, SQLMetadataStore
+from .registry import derived_variable_registry
 
 
 class OriginDict(pydantic.BaseModel):
@@ -17,6 +18,7 @@ class OriginDict(pydantic.BaseModel):
     operators: list
     operator_kwargs: list
     esm_collection_key: str = None
+    derived_variable: bool = False
     variable: str = None
 
 
@@ -57,7 +59,18 @@ class Collection:
         if isinstance(variable, (list, tuple)):
             for v in variable:
                 individual_query = self.esm_collection_query.copy()
-                individual_query['variable'] = v
+
+                if (v not in self.base_variables) and (v in derived_variable_registry):
+                    self.origins_dict.update(derived_variable=True)
+                    derived_var = derived_variable_registry[v]
+                    individual_query['variable'] = derived_var.dependent_vars
+
+                elif v in self.base_variables:
+                    individual_query['variable'] = v
+
+                else:
+                    raise ValueError(f'{v} not found in base variables or derived variables')
+
                 # individual_query = self.esm_collection_query.copy()['variable'] = v
                 self.origins_dict.update(esm_collection_query=individual_query)
                 subset_catalog = self.catalog.search(**individual_query)
@@ -71,7 +84,14 @@ class Collection:
                         df = subset_catalog[catalog_key]
 
                         # Open the dataset using the prescribed key
-                        ds = self.apply_operators(df(**self.kwargs).to_dask())
+                        ds = df(**self.kwargs).to_dask()
+
+                        # If there are derived variables, calculate them
+                        if self.origins_dict['derived_variable']:
+                            ds = derived_var(ds)
+
+                        # Apply operators
+                        self.apply_operators(ds)
 
                         # Add this dataset to the dictionary of datasets
                         dsets[catalog_key] = ds
