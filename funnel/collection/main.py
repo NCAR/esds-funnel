@@ -40,7 +40,7 @@ class Collection:
             collection_name=self.collection_name,
             esm_collection_json=self.esm_collection_json,
             esm_collection_query=self.esm_collection_query,
-            operators=self.operators,
+            operators=[op.__name__ for op in self.operators],
             operator_kwargs=self.operator_kwargs,
         ).dict()
         self.catalog = intake.open_esm_datastore(self.esm_collection_json)
