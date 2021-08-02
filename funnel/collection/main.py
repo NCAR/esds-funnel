@@ -54,7 +54,7 @@ class Collection:
         if isinstance(variable, str):
             variable = [variable]
 
-        elif isinstance(variable, (list, tuple)):
+        if isinstance(variable, (list, tuple)):
             for v in variable:
                 individual_query = self.esm_collection_query.copy()
                 individual_query['variable'] = v
