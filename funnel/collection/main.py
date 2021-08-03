@@ -8,6 +8,7 @@ from dask.base import tokenize
 
 from ..config import config as default_config
 from ..metadata_db.main import MemoryMetadataStore, SQLMetadataStore
+from .registry import derived_variable_registry
 
 
 class OriginDict(pydantic.BaseModel):
@@ -17,6 +18,7 @@ class OriginDict(pydantic.BaseModel):
     operators: list
     operator_kwargs: list
     esm_collection_key: str = None
+    derived_variable: bool = False
     variable: str = None
 
 
@@ -48,49 +50,68 @@ class Collection:
         self.base_variables = set(self.catalog.df.variable)
         self.variable = self.esm_collection_query.get(self.variable_column_name, None)
 
-    def to_dataset_dict(self, variable, compute=False):
+    def to_dataset_dict(self, variable):
         """Returns a dictionary of datasets similar to intake-esm"""
         dsets = {}
         if isinstance(variable, str):
             variable = [variable]
 
-        if isinstance(variable, (list, tuple)):
-            for v in variable:
-                individual_query = self.esm_collection_query.copy()
-                individual_query['variable'] = v
-                # individual_query = self.esm_collection_query.copy()['variable'] = v
-                self.origins_dict.update(esm_collection_query=individual_query)
-                subset_catalog = self.catalog.search(**individual_query)
-                for catalog_key in subset_catalog.keys():
-                    self.origins_dict.update(esm_collection_key=catalog_key)
-                    individual_key = tokenize(self.origins_dict)
-                    if individual_key in self.metadata_store:
-                        dsets[catalog_key] = self.metadata_store.get(individual_key)
-                    else:
-                        # read in the dataset - add to the dataset dict
-                        df = subset_catalog[catalog_key]
+        if not isinstance(variable, (list, tuple)):
 
-                        # Open the dataset using the prescribed key
-                        ds = self.apply_operators(df(**self.kwargs).to_dask())
-
-                        # Add this dataset to the dictionary of datasets
-                        dsets[catalog_key] = ds
-
-                        # Add this to the database
-                        if ds.nbytes > 1000000:
-                            warnings.warn(
-                                f'Warning: Dataset you are saving is larger than 1 GB \n Total size:{ds.nbytes * 1e-6} GB'
-                            )
-                        self.metadata_store.put(
-                            individual_key,
-                            dsets[catalog_key],
-                            self.serializer,
-                            custom_fields=self.origins_dict,
-                        )
-        else:
             raise TypeError(
                 f'Found `variable` to be an {type(variable)} type. `variable` must be a string, list, or tuple'
             )
+
+        for v in variable:
+            individual_query = self.esm_collection_query.copy()
+
+            if (v not in self.base_variables) and (v in derived_variable_registry):
+                self.origins_dict.update(derived_variable=True)
+                derived_var = derived_variable_registry[v]
+                individual_query[self.variable_column_name] = derived_var.dependent_vars
+
+            elif v in self.base_variables:
+                individual_query[self.variable_column_name] = v
+
+            else:
+                raise ValueError(f'{v} not found in base variables or derived variables')
+
+            # individual_query = self.esm_collection_query.copy()['variable'] = v
+            self.origins_dict.update(esm_collection_query=individual_query)
+            subset_catalog = self.catalog.search(**individual_query)
+            for catalog_key in subset_catalog.keys():
+                self.origins_dict.update(esm_collection_key=catalog_key)
+                individual_key = tokenize(self.origins_dict)
+                if individual_key in self.metadata_store:
+                    dsets[catalog_key] = self.metadata_store.get(individual_key)
+                else:
+                    # read in the dataset - add to the dataset dict
+                    df = subset_catalog[catalog_key]
+
+                    # Open the dataset using the prescribed key
+                    ds = df(**self.kwargs).to_dask()
+
+                    # If there are derived variables, calculate them
+                    if self.origins_dict['derived_variable']:
+                        ds = derived_var(ds)
+
+                    # Apply operators
+                    ds = self.apply_operators(ds)
+
+                    # Add this dataset to the dictionary of datasets
+                    dsets[catalog_key] = ds
+
+                    # Add this to the database
+                    if ds.nbytes > 1000000:
+                        warnings.warn(
+                            f'Warning: Dataset you are saving is larger than 1 GB \n Total size:{ds.nbytes * 1e-6} GB'
+                        )
+                    self.metadata_store.put(
+                        individual_key,
+                        dsets[catalog_key],
+                        self.serializer,
+                        custom_fields=self.origins_dict,
+                    )
 
         return dsets
 
