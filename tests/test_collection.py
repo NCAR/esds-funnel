@@ -4,9 +4,7 @@ import pathlib
 import pytest
 
 from funnel import Collection
-from funnel.collection.derive_variables import (
-    derived_variable_registry,
-    register_derived_variable)
+from funnel.collection.derive_variables import register_derived_variable
 
 root_directory = pathlib.Path(os.path.abspath(os.path.dirname(__file__))).parent
 
@@ -22,10 +20,11 @@ def choose_boulder(ds, **kwargs):
 def ensemble_mean(ds, **kwargs):
     return ds.mean(dim='member_id')
 
+
 @register_derived_variable(
-        varname='air_temperature_degC',
-        dependent_vars=['T'],
-    )
+    varname='air_temperature_degC',
+    dependent_vars=['T'],
+)
 def calculate_degC(ds):
     """compute temperature in degC"""
     ds['air_temperature_degC'] = ds.T - 273.15
@@ -34,7 +33,6 @@ def calculate_degC(ds):
         ds.air_temperature_degC.attrs['coordinates'] = ds.T.attrs['coordinates']
         ds.air_temperature_degC.encoding = ds.T.encoding
     return ds.drop_vars(['T'])
-
 
 
 @pytest.mark.parametrize(
@@ -75,6 +73,7 @@ def test_get_collection_object_1var(
 
     assert isinstance(c.to_dataset_dict(variable=variable), dict)
 
+
 @pytest.mark.parametrize(
     'collection_name, esm_collection_json, esm_collection_query, operators, operator_kwargs, serializer, kwargs',
     [
@@ -113,5 +112,5 @@ def test_get_collection_object_derived(
     dsets = c.to_dataset_dict(variable=variable)
     keys = dsets.keys()
     print(keys)
-    
+
     assert variable in dsets['atm.20C.monthly'].variables
