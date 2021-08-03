@@ -96,7 +96,7 @@ class Collection:
                         ds = derived_var(ds)
 
                     # Apply operators
-                    self.apply_operators(ds)
+                    ds = self.apply_operators(ds)
 
                     # Add this dataset to the dictionary of datasets
                     dsets[catalog_key] = ds
