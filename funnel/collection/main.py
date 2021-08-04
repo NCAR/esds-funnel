@@ -47,7 +47,7 @@ class Collection:
         ).dict()
         self.catalog = intake.open_esm_datastore(self.esm_collection_json)
         self.variable_column_name = self.catalog.aggregation_info.variable_column_name
-        self.base_variables = set(self.catalog.df.variable)
+        self.base_variables = set(self.catalog.df[self.variable_column_name])
         self.variable = self.esm_collection_query.get(self.variable_column_name, None)
 
     def to_dataset_dict(self, variable):
