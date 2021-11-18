@@ -108,6 +108,9 @@ class SQLMetadataStore(BaseMetadataStore):
 
     database_url: str = f'sqlite:///{tempfile.gettempdir()}/funnel.db'
     readonly: bool = False
+    serializer: str = 'auto'
+    serializer_dump_kwargs: typing.Dict[str, typing.Any] = pydantic.Field(default_factory=dict)
+    serializer_load_kwargs: typing.Dict[str, typing.Any] = pydantic.Field(default_factory=dict)
 
     def __post_init_post_parse__(self):
 
@@ -125,6 +128,7 @@ class SQLMetadataStore(BaseMetadataStore):
         """
         Get the metadata from the database.
         """
+        load_kwargs = load_kwargs or self.serializer_load_kwargs
         with self._session_factory() as session:
             artifact = session.query(models.Artifact).filter_by(key=key).first()
             if artifact is None:
@@ -136,13 +140,16 @@ class SQLMetadataStore(BaseMetadataStore):
         self,
         key: str,
         value: typing.Any,
-        serializer: str = 'auto',
-        dump_kwargs={},
-        custom_fields={},
+        serializer: str = None,
+        dump_kwargs: typing.Dict[str, typing.Any] = None,
+        custom_fields: typing.Dict[str, typing.Any] = None,
     ):
         """
         Create and record a new artifact in the database.
         """
+        serializer = serializer or self.serializer
+        dump_kwargs = dump_kwargs or self.serializer_dump_kwargs
+        custom_fields = custom_fields or {}
         artifact = self.cache_store.put(
             key, value, serializer, dump_kwargs=dump_kwargs, custom_fields=custom_fields
         )
