@@ -74,11 +74,18 @@ class MemoryMetadataStore(BaseMetadataStore):
         Parameters
         ----------
         key : str
-        value :
+
+        value : typing.Any
             Any serializable Python object
         serializer : str
-            The serializer to use.
-        **dump_kwargs : dict
+            The name of the serializer you want to use. The built-in
+            serializers are:
+                - 'auto' (default): automatically choose the serializer based on the type of the value
+                - 'xarray.netcdf': requires xarray and netCDF4
+                - 'xarray.zarr': requires xarray and zarr
+            You can also register your own serializer via the @funnel.registry.serializers.register decorator.
+        dump_kwargs : dict
+            Additional keyword arguments to pass to the serializer when dumping artifact to the cache store.
         """
         artifact = self.cache_store.put(key, value, serializer, dump_kwargs=dump_kwargs)
         if key not in self:
@@ -90,7 +97,7 @@ class MemoryMetadataStore(BaseMetadataStore):
         Parameters
         ----------
         key : str
-        **load_kwargs : dict
+        load_kwargs : dict
 
         Returns
         -------
@@ -118,7 +125,12 @@ class SQLMetadataStore(BaseMetadataStore):
     readonly : bool
         Whether the metadata store is readonly.
     serializer : str
-        The serializer to use.
+        The name of the serializer you want to use. The built-in
+        serializers are:
+            - 'auto' (default): automatically choose the serializer based on the type of the value
+            - 'xarray.netcdf': requires xarray and netCDF4
+            - 'xarray.zarr': requires xarray and zarr
+        You can also register your own serializer via the @funnel.registry.serializers.register decorator.
     serializer_load_kwargs : dict
         The load kwargs to use when loading artifacts from the cache store.
     serializer_dump_kwargs : dict
@@ -175,12 +187,19 @@ class SQLMetadataStore(BaseMetadataStore):
         Parameters
         ----------
         key : str
-        value :
+        value : typing.Any
             Any serializable Python object
         serializer : str
-            The serializer to use.
+            The name of the serializer you want to use. The built-in
+            serializers are:
+                - 'auto' (default): automatically choose the serializer based on the type of the value
+                - 'xarray.netcdf': requires xarray and netCDF4
+                - 'xarray.zarr': requires xarray and zarr
+            You can also register your own serializer via the @funnel.registry.serializers.register decorator.
         dump_kwargs : dict
+            Additional keyword arguments to pass to the serializer when dumping artifact to the cache store.
         custom_fields : dict
+            A dict with types that serialize to json. These fields can be used for searching artifacts in the metadata store.
 
         """
         serializer = serializer or self.serializer

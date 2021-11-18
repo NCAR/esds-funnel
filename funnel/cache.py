@@ -112,8 +112,16 @@ class CacheStore:
         key : str
         value : typing.Any
         serializer : str
+            The name of the serializer you want to use. The built-in
+            serializers are:
+                - 'auto' (default): automatically choose the serializer based on the type of the value
+                - 'xarray.netcdf': requires xarray and netCDF4
+                - 'xarray.zarr': requires xarray and zarr
+            You can also register your own serializer via the @funnel.registry.serializers.register decorator.
         dump_kwargs : dict
+            Additional keyword arguments to pass to the serializer when dumping artifact to the cache store.
         custom_fields : dict
+            A dict with types that serialize to json. These fields can be used for searching artifacts in the metadata store.
 
         Returns
         -------
