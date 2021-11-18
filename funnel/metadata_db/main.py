@@ -98,6 +98,7 @@ class MemoryMetadataStore(BaseMetadataStore):
         ----------
         key : str
         load_kwargs : dict
+            Additional keyword arguments to pass to the serializer when loading artifact from the cache store.
 
         Returns
         -------
@@ -162,7 +163,8 @@ class SQLMetadataStore(BaseMetadataStore):
         Parameters
         ----------
         key : str
-        **load_kwargs : dict
+        load_kwargs : dict
+            Additional keyword arguments to pass to the serializer when loading artifact from the cache store.
 
         """
         load_kwargs = load_kwargs or self.serializer_load_kwargs
