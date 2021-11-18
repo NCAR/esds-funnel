@@ -77,6 +77,7 @@ class MemoryMetadataStore(BaseMetadataStore):
         value :
             Any serializable Python object
         serializer : str
+            The serializer to use.
         **dump_kwargs : dict
         """
         artifact = self.cache_store.put(key, value, serializer, dump_kwargs=dump_kwargs)
@@ -89,7 +90,12 @@ class MemoryMetadataStore(BaseMetadataStore):
         Parameters
         ----------
         key : str
-        load_kwargs : dict
+        **load_kwargs : dict
+
+        Returns
+        -------
+        value :
+            the value for the key if the key is in both the metadata and cache stores.
         """
         x = self._df.loc[key]
         _load_kwargs = load_kwargs or x.load_kwargs
@@ -104,6 +110,19 @@ class SQLMetadataStore(BaseMetadataStore):
     """
     A metadata store that uses SQLAlchemy to store artifact metadata
     in a SQL database (PostgreSQL, MySQL, SQLite).
+
+    Parameters
+    ----------
+    database_url : str
+        The database URL to use.
+    readonly : bool
+        Whether the metadata store is readonly.
+    serializer : str
+        The serializer to use.
+    serializer_load_kwargs : dict
+        The load kwargs to use when loading artifacts from the cache store.
+    serializer_dump_kwargs : dict
+        The dump kwargs to use when dumping artifacts to the cache store.
     """
 
     database_url: str = f'sqlite:///{tempfile.gettempdir()}/funnel.db'
@@ -124,9 +143,15 @@ class SQLMetadataStore(BaseMetadataStore):
         with self._session_factory() as session:
             return bool(session.query(models.Artifact).filter_by(key=key).first())
 
-    def get(self, key: str, **load_kwargs):
+    def get(self, key: str, **load_kwargs) -> typing.Any:
         """
         Get the metadata from the database.
+
+        Parameters
+        ----------
+        key : str
+        **load_kwargs : dict
+
         """
         load_kwargs = load_kwargs or self.serializer_load_kwargs
         with self._session_factory() as session:
@@ -143,9 +168,20 @@ class SQLMetadataStore(BaseMetadataStore):
         serializer: str = None,
         dump_kwargs: typing.Dict[str, typing.Any] = None,
         custom_fields: typing.Dict[str, typing.Any] = None,
-    ):
+    ) -> None:
         """
         Create and record a new artifact in the database.
+
+        Parameters
+        ----------
+        key : str
+        value :
+            Any serializable Python object
+        serializer : str
+            The serializer to use.
+        dump_kwargs : dict
+        custom_fields : dict
+
         """
         serializer = serializer or self.serializer
         dump_kwargs = dump_kwargs or self.serializer_dump_kwargs
@@ -162,7 +198,7 @@ class SQLMetadataStore(BaseMetadataStore):
                 return db_artifact
 
     @property
-    def df(self):
+    def df(self) -> pd.DataFrame:
         """
         Return a pandas DataFrame of the metadata stored in the database.
         """

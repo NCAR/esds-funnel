@@ -20,6 +20,12 @@ class Decorator(Protocol):
 
 
 class registry:
+
+    """Funnel's global registry entrypoint.
+
+    This is used to register serializers and other components that are used by the funnel.
+    """
+
     serializers: Decorator = catalogue.create('funnel', 'serializers', entry_points=True)
     metadata_store: Decorator = catalogue.create('funnel', 'metadata_store', entry_points=True)
 
@@ -33,7 +39,21 @@ class registry:
 
     @classmethod
     def has(cls, registry_name: str, func_name: str) -> bool:
-        """Check whether a function is available in a registry."""
+        """Check whether a function is available in a registry.
+
+        Parameters
+        ----------
+        registry_name : str
+            The name of the registry to check.
+        func_name : str
+            The name of the function to check.
+
+        Returns
+        -------
+        bool
+            Whether the function is available in the registry.
+
+        """
         if not hasattr(cls, registry_name):
             return False
         reg = getattr(cls, registry_name)
@@ -41,7 +61,20 @@ class registry:
 
     @classmethod
     def get(cls, registry_name: str, func_name: str) -> typing.Callable:
-        """Get a registered function from a given registry."""
+        """Get a registered function from a given registry.
+
+        Parameters
+        ----------
+        registry_name : str
+            The name of the registry to get the function from.
+        func_name : str
+            The name of the function to get.
+
+        Returns
+        -------
+        func : typing.Callable
+            The function from the registry.
+        """
         if not hasattr(cls, registry_name):
             raise ValueError(f"Unknown registry: '{registry_name}'")
         reg = getattr(cls, registry_name)
