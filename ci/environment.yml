@@ -11,15 +11,16 @@ dependencies:
   - netcdf4
   - pip
   - pooch
+  - prefect>=0.15.9,<2.0
   - pydantic
   - pytest
   - pytest-cov
   - pytest-sugar
   - pytest-xdist
+  - s3fs
+  - sqlalchemy-utils
+  - sqlalchemy>=1.4.21
   - xarray
   - zarr
-  - sqlalchemy>=1.4.21
-  - sqlalchemy-utils
-  - s3fs
   - pip:
       - -r ../requirements.txt
