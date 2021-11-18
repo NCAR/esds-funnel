@@ -157,14 +157,17 @@ class SQLMetadataStore(BaseMetadataStore):
 
         if not self.readonly and not database_exists(self.database_url):
             create_database(self.database_url)
+            models.Base.metadata.create_all(self._engine)
+
+    @property
+    def _engine(self):
+        return create_engine(
+            self.database_url, connect_args={'check_same_thread': False}, poolclass=NullPool
+        )
 
     @property
     def _session_factory(self):
-        _engine = create_engine(
-            self.database_url, connect_args={'check_same_thread': False}, poolclass=NullPool
-        )
-        models.Base.metadata.create_all(_engine)
-        return sessionmaker(bind=_engine, autocommit=False, autoflush=False)
+        return sessionmaker(bind=self._engine, autocommit=False, autoflush=False)
 
     def __contains__(self, key: str) -> bool:
         with self._session_factory() as session:
