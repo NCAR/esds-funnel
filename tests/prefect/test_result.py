@@ -21,3 +21,4 @@ def test_result(data, serializer):
     new = r.write(data)
     assert new.read(new.location).value == data
     assert r.metadata_store.get(new.location) == data
+    assert r.exists(new.location)
