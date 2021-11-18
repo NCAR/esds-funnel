@@ -22,6 +22,13 @@ if not default_config_path.exists():
 class Config(pydantic.BaseSettings):
     """
     Configuration settings for the Funnel.
+
+    Parameters
+    ----------
+    config_path : str
+        Path to the config file.
+    metadata_store : funnel.SQLMetataStore or funnel.MemoryMetadataStore
+        The type of metadata store to use.
     """
 
     metadata_store: typing.Union[SQLMetadataStore, MemoryMetadataStore] = None
@@ -29,9 +36,15 @@ class Config(pydantic.BaseSettings):
     class Config:
         validate_assignment = True
 
-    def load_config(self, config_path: str):
+    def load_config(self, config_path: str) -> None:
         """
         Loads the config from a file.
+
+        Parameters
+        ----------
+        config_path : str
+            Path to the config file.
+
         """
         with open(config_path) as f:
             config = dask.config.expand_environment_variables(yaml.safe_load(f))

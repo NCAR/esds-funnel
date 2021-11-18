@@ -23,11 +23,21 @@ class FunnelResult(Result):
 
     @property
     def default_location(self) -> str:
-        return 'prefect-result-' + slugify(pendulum.now('utc').isoformat())
+        return f"prefect-result-{slugify(pendulum.now('utc').isoformat())}"
 
     def read(self, location: str) -> Result:
         """
         Reads the result from the metadata store.
+
+        Parameters
+        ----------
+        location : str
+            The location of the result to read.
+
+        Returns
+        -------
+        Result
+            The result at the given location.
         """
         new = self.copy()
         new.location = location
@@ -40,6 +50,13 @@ class FunnelResult(Result):
     def write(self, value_: typing.Any, **kwargs: typing.Any) -> Result:
         """
         Writes the result to the metadata store.
+
+        Parameters
+        ----------
+        value_ : typing.Any
+            The value to write to the metadata store.
+        kwargs : typing.Any
+            Additional keyword arguments
         """
 
         new = self.format(**{})
@@ -53,9 +70,14 @@ class FunnelResult(Result):
 
     def exists(self, location: str, **kwargs: typing.Any) -> bool:
         """Checks whether the target result exists in the metadata store.
-
         Does not validate whether the result is `valid`, only that it is present.
 
+        Parameters
+        ----------
+        location : str
+            The location of the result to check.
+        kwargs : typing.Any
+            Additional keyword arguments.
         """
         return location in self.metadata_store
 
