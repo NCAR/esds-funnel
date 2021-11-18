@@ -51,7 +51,7 @@ def test_result_flow(executor):
         )
     )
 
-    @task(result=r)
+    @task(target='testing.nc', result=r)
     def xarray_task():
         time.sleep(2)
         return xr.tutorial.open_dataset('rasm').isel(time=0)

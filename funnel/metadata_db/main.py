@@ -6,6 +6,7 @@ import pandas as pd
 import pydantic
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import NullPool
 from sqlalchemy_utils import create_database, database_exists
 
 from ..cache import CacheStore
@@ -25,6 +26,8 @@ class BaseMetadataStore(abc.ABC):
 
     cache_store: CacheStore
     readonly: bool
+    serializer_dump_kwargs: typing.Dict[str, typing.Any] = pydantic.Field(default_factory=dict)
+    serializer_load_kwargs: typing.Dict[str, typing.Any] = pydantic.Field(default_factory=dict)
 
     @abc.abstractmethod
     def put(self, key, value, **dump_kwargs) -> None:
@@ -49,6 +52,9 @@ class MemoryMetadataStore(BaseMetadataStore):
     """Records metadata information in an in-memory pandas DataFrame."""
 
     readonly: bool = False
+    serializer: str = 'auto'
+    serializer_dump_kwargs: typing.Dict[str, typing.Any] = pydantic.Field(default_factory=dict)
+    serializer_load_kwargs: typing.Dict[str, typing.Any] = pydantic.Field(default_factory=dict)
 
     def __post_init_post_parse__(self):
         self.columns = [
@@ -87,6 +93,9 @@ class MemoryMetadataStore(BaseMetadataStore):
         dump_kwargs : dict
             Additional keyword arguments to pass to the serializer when dumping artifact to the cache store.
         """
+
+        serializer = serializer or self.serializer
+        dump_kwargs = dump_kwargs or self.serializer_dump_kwargs
         artifact = self.cache_store.put(key, value, serializer, dump_kwargs=dump_kwargs)
         if key not in self:
             self._df.loc[key] = artifact.dict()
@@ -106,7 +115,7 @@ class MemoryMetadataStore(BaseMetadataStore):
             the value for the key if the key is in both the metadata and cache stores.
         """
         x = self._df.loc[key]
-        _load_kwargs = load_kwargs or x.load_kwargs
+        _load_kwargs = load_kwargs or self.serializer_load_kwargs or x.load_kwargs
         return self.cache_store.get(key, x.serializer, **_load_kwargs)
 
     def __contains__(self, key: str) -> bool:
@@ -148,9 +157,14 @@ class SQLMetadataStore(BaseMetadataStore):
 
         if not self.readonly and not database_exists(self.database_url):
             create_database(self.database_url)
-        self._engine = create_engine(self.database_url, connect_args={'check_same_thread': False})
-        models.Base.metadata.create_all(self._engine)
-        self._session_factory = sessionmaker(bind=self._engine, autocommit=False, autoflush=False)
+
+    @property
+    def _session_factory(self):
+        _engine = create_engine(
+            self.database_url, connect_args={'check_same_thread': False}, poolclass=NullPool
+        )
+        models.Base.metadata.create_all(_engine)
+        return sessionmaker(bind=_engine, autocommit=False, autoflush=False)
 
     def __contains__(self, key: str) -> bool:
         with self._session_factory() as session:
