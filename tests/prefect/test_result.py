@@ -1,5 +1,10 @@
+import os
+import time
+
 import pytest
 import xarray as xr
+from prefect import Flow, task
+from prefect.executors import DaskExecutor, LocalExecutor
 
 from funnel import CacheStore, SQLMetadataStore
 from funnel.prefect.result import FunnelResult
@@ -17,8 +22,42 @@ ds = xr.tutorial.open_dataset('air_temperature').isel(time=0)
     ],
 )
 def test_result(data, serializer):
-    r = FunnelResult(SQLMetadataStore(CacheStore(), serializer=serializer))
+    r = FunnelResult(
+        SQLMetadataStore(
+            CacheStore(),
+            serializer=serializer,
+        )
+    )
+
     new = r.write(data)
     assert new.read(new.location).value == data
     assert r.metadata_store.get(new.location) == data
     assert r.exists(new.location)
+
+
+@pytest.mark.parametrize(
+    'executor',
+    [
+        LocalExecutor(),
+        DaskExecutor(cluster_kwargs={'processes': False, 'threads_per_worker': 8}, debug=True),
+    ],
+)
+def test_result_flow(executor):
+    os.environ['PREFECT__FLOWS__CHECKPOINTING'] = 'True'
+    r = FunnelResult(
+        SQLMetadataStore(
+            CacheStore(),
+            serializer='xarray.netcdf',
+        )
+    )
+
+    @task(result=r)
+    def xarray_task():
+        time.sleep(2)
+        return xr.tutorial.open_dataset('rasm').isel(time=0)
+
+    with Flow('test') as flow:
+        xarray_task()
+
+    state = flow.run(executor=executor)
+    assert not state.is_failed()
