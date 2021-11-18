@@ -108,6 +108,7 @@ class SQLMetadataStore(BaseMetadataStore):
 
     database_url: str = f'sqlite:///{tempfile.gettempdir()}/funnel.db'
     readonly: bool = False
+    serializer: str = 'auto'
 
     def __post_init_post_parse__(self):
 
@@ -136,13 +137,14 @@ class SQLMetadataStore(BaseMetadataStore):
         self,
         key: str,
         value: typing.Any,
-        serializer: str = 'auto',
-        dump_kwargs={},
-        custom_fields={},
+        serializer: str = None,
+        dump_kwargs: typing.Dict[str, typing.Any] = {},
+        custom_fields: typing.Dict[str, typing.Any] = {},
     ):
         """
         Create and record a new artifact in the database.
         """
+        serializer = serializer or self.serializer
         artifact = self.cache_store.put(
             key, value, serializer, dump_kwargs=dump_kwargs, custom_fields=custom_fields
         )
