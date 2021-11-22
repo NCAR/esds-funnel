@@ -42,7 +42,7 @@ autodoc_member_order = 'groupwise'
 
 # MyST config
 myst_enable_extensions = ['amsmath', 'colon_fence', 'deflist', 'html_image']
-myst_url_schemes = ('http', 'https', 'mailto')
+myst_url_schemes = ['http', 'https', 'mailto']
 
 comments_config = {
     'utterances': {'repo': 'NCAR/esds-funnel', 'optional': 'config', 'label': '💬 comment'},
@@ -126,7 +126,7 @@ html_theme_options = dict(
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = '../_static/images/NSF_4-Color_bitmap_Logo.png'
+# html_logo = '../_static/images/NSF_4-Color_bitmap_Logo.png'
 
 
 # The name of an image file (within the static path) to use as favicon of the
@@ -137,7 +137,7 @@ html_logo = '../_static/images/NSF_4-Color_bitmap_Logo.png'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['../_static']
+# html_static_path = ['../_static']
 
 # Sometimes the savefig directory doesn't exist and needs to be created
 # https://github.com/ipython/ipython/issues/8733

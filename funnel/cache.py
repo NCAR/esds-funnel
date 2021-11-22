@@ -65,9 +65,11 @@ class CacheStore:
         serializer : str
             The name of the serializer you want to use. The built-in
             serializers are:
+
                 - 'auto' (default): automatically choose the serializer based on the type of the value
                 - 'xarray.netcdf': requires xarray and netCDF4
                 - 'xarray.zarr': requires xarray and zarr
+
             You can also register your own serializer via the @funnel.registry.serializers.register decorator.
         load_kwargs : dict
             Additional keyword arguments to pass to the serializer when loading artifact from the cache store.
@@ -121,9 +123,11 @@ class CacheStore:
         serializer : str
             The name of the serializer you want to use. The built-in
             serializers are:
+
                 - 'auto' (default): automatically choose the serializer based on the type of the value
                 - 'xarray.netcdf': requires xarray and netCDF4
                 - 'xarray.zarr': requires xarray and zarr
+
             You can also register your own serializer via the @funnel.registry.serializers.register decorator.
         dump_kwargs : dict
             Additional keyword arguments to pass to the serializer when dumping artifact to the cache store.

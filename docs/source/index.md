@@ -5,7 +5,6 @@
 ```{toctree}
 ---
 maxdepth: 2
-caption: Tutorials
 hidden:
 ---
 tutorials/index.md
@@ -14,7 +13,14 @@ tutorials/index.md
 ```{toctree}
 ---
 maxdepth: 2
-caption: Reference
+hidden:
+---
+how-to-guides/index.md
+```
+
+```{toctree}
+---
+maxdepth: 2
 hidden:
 ---
 reference/index.md
