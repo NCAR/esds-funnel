@@ -1,4 +1,7 @@
+import os
 import typing
+
+os.environ['PREFECT__FLOWS__CHECKPOINTING'] = 'True'
 
 import pendulum
 import pydantic
