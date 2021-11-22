@@ -34,8 +34,8 @@ See [documentation](https://esds-funnel.readthedocs.io) for more information.
 [github-ci-link]: https://github.com/NCAR/esds-funnel/actions?query=workflow%3ACI
 [codecov-badge]: https://img.shields.io/codecov/c/github/NCAR/esds-funnel.svg?logo=codecov&style=for-the-badge
 [codecov-link]: https://codecov.io/gh/NCAR/esds-funnel
-[rtd-badge]: https://img.shields.io/readthedocs/esds-funnel/latest.svg?style=for-the-badge
-[rtd-link]: https://esds-funnel.readthedocs.io/en/latest/?badge=latest
+[rtd-badge]: https://img.shields.io/readthedocs/funnel/latest.svg?style=for-the-badge
+[rtd-link]: https://funnel.readthedocs.io/en/latest/?badge=latest
 [pypi-badge]: https://img.shields.io/pypi/v/esds-funnel?logo=pypi&style=for-the-badge
 [pypi-link]: https://pypi.org/project/esds-funnel
 [conda-badge]: https://img.shields.io/conda/vn/conda-forge/esds-funnel?logo=anaconda&style=for-the-badge

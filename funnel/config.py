@@ -21,7 +21,7 @@ if not default_config_path.exists():
 
 class Config(pydantic.BaseSettings):
     """
-    Configuration settings for the Funnel.
+    Configuration settings for Funnel.
 
     Parameters
     ----------

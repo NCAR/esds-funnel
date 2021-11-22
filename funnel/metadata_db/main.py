@@ -42,7 +42,7 @@ class BaseMetadataStore(abc.ABC):
         ...
 
     @property
-    @abc.abstractclassmethod
+    @abc.abstractmethod
     def df(self) -> pd.DataFrame:
         ...
 
@@ -86,9 +86,11 @@ class MemoryMetadataStore(BaseMetadataStore):
         serializer : str
             The name of the serializer you want to use. The built-in
             serializers are:
+
                 - 'auto' (default): automatically choose the serializer based on the type of the value
                 - 'xarray.netcdf': requires xarray and netCDF4
                 - 'xarray.zarr': requires xarray and zarr
+
             You can also register your own serializer via the @funnel.registry.serializers.register decorator.
         dump_kwargs : dict
             Additional keyword arguments to pass to the serializer when dumping artifact to the cache store.
@@ -137,9 +139,11 @@ class SQLMetadataStore(BaseMetadataStore):
     serializer : str
         The name of the serializer you want to use. The built-in
         serializers are:
+
             - 'auto' (default): automatically choose the serializer based on the type of the value
             - 'xarray.netcdf': requires xarray and netCDF4
             - 'xarray.zarr': requires xarray and zarr
+
         You can also register your own serializer via the @funnel.registry.serializers.register decorator.
     serializer_load_kwargs : dict
         The load kwargs to use when loading artifacts from the cache store.
@@ -211,9 +215,11 @@ class SQLMetadataStore(BaseMetadataStore):
         serializer : str
             The name of the serializer you want to use. The built-in
             serializers are:
+
                 - 'auto' (default): automatically choose the serializer based on the type of the value
                 - 'xarray.netcdf': requires xarray and netCDF4
                 - 'xarray.zarr': requires xarray and zarr
+
             You can also register your own serializer via the @funnel.registry.serializers.register decorator.
         dump_kwargs : dict
             Additional keyword arguments to pass to the serializer when dumping artifact to the cache store.

@@ -23,7 +23,7 @@ class registry:
 
     """Funnel's global registry entrypoint.
 
-    This is used to register serializers and other components that are used by the funnel.
+    This is used to register serializers and other components that are used by Funnel.
     """
 
     serializers: Decorator = catalogue.create('funnel', 'serializers', entry_points=True)
