@@ -24,6 +24,11 @@ repos:
     hooks:
       - id: flake8
 
+  - repo: https://github.com/keewis/blackdoc
+    rev: v0.3.4
+    hooks:
+      - id: blackdoc
+
   - repo: https://github.com/PyCQA/isort
     rev: 5.10.1
     hooks:

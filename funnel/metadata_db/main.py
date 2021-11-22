@@ -42,7 +42,7 @@ class BaseMetadataStore(abc.ABC):
         ...
 
     @property
-    @abc.abstractclassmethod
+    @abc.abstractmethod
     def df(self) -> pd.DataFrame:
         ...
 
