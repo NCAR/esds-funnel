@@ -125,6 +125,71 @@ class MemoryMetadataStore(BaseMetadataStore):
 
 
 @pydantic.dataclasses.dataclass
+class CacheMetadataStore(BaseMetadataStore):
+    """Uses the cache_store as a database"""
+
+    readonly: bool = False
+    serializer: str = 'auto'
+    serializer_dump_kwargs: typing.Dict[str, typing.Any] = pydantic.Field(default_factory=dict)
+    serializer_load_kwargs: typing.Dict[str, typing.Any] = pydantic.Field(default_factory=dict)
+
+    def put(
+        self, key: str, value, serializer: str = 'auto', dump_kwargs: typing.Optional[dict] = None
+    ) -> None:
+        """Records and serializes key with its corresponding value in the metadata and cache store.
+
+        Parameters
+        ----------
+        key : str
+
+        value : typing.Any
+            Any serializable Python object
+        serializer : str
+            The name of the serializer you want to use. The built-in
+            serializers are:
+
+                - 'auto' (default): automatically choose the serializer based on the type of the value
+                - 'xarray.netcdf': requires xarray and netCDF4
+                - 'xarray.zarr': requires xarray and zarr
+
+            You can also register your own serializer via the @funnel.registry.serializers.register decorator.
+        dump_kwargs : dict
+            Additional keyword arguments to pass to the serializer when dumping artifact to the cache store.
+        """
+
+        serializer = serializer or self.serializer
+        dump_kwargs = dump_kwargs or self.serializer_dump_kwargs
+        self.cache_store.put(key, value, serializer, dump_kwargs=dump_kwargs)
+
+    def get(self, key: str, **load_kwargs) -> typing.Any:
+        """Returns the value for the key if the key is in both the metadata and cache stores.
+
+        Parameters
+        ----------
+        key : str
+        load_kwargs : dict
+            Additional keyword arguments to pass to the serializer when loading artifact from the cache store.
+
+        Returns
+        -------
+        value :
+            the value for the key if the key is in both the metadata and cache stores.
+        """
+        # note: in an effort to avoid using a database/dataframe, I've made two primary simplifications here:
+        # 1. I don't use the artifacts predetermine load_kwargs
+        # 2. I've hard coded the serialzer
+        _load_kwargs = load_kwargs or self.serializer_load_kwargs or {}
+        return self.cache_store.get(key, 'xarray.zarr', **_load_kwargs)
+
+    def __contains__(self, key: str) -> bool:
+        return key in self.cache_store
+
+    @property
+    def df(self) -> pd.DataFrame:
+        return NotImplemented
+
+
+@pydantic.dataclasses.dataclass
 class SQLMetadataStore(BaseMetadataStore):
     """
     A metadata store that uses SQLAlchemy to store artifact metadata
