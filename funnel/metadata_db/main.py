@@ -1,4 +1,5 @@
 import abc
+import json
 import tempfile
 import typing
 
@@ -133,6 +134,16 @@ class CacheMetadataStore(BaseMetadataStore):
     serializer_dump_kwargs: typing.Dict[str, typing.Any] = pydantic.Field(default_factory=dict)
     serializer_load_kwargs: typing.Dict[str, typing.Any] = pydantic.Field(default_factory=dict)
 
+    def __post_init_post_parse__(self):
+        self.cache_store._ensure_dir(self._metadata_store_path)
+
+    @property
+    def _metadata_store_path(self) -> str:
+        return self.cache_store._construct_item_path('funnel_metadata_store')
+
+    def _artifact_meta_path(self, key: str) -> str:
+        return f'{self._metadata_store_path}/{key}.artifact.json'
+
     def put(
         self, key: str, value, serializer: str = 'auto', dump_kwargs: typing.Optional[dict] = None
     ) -> None:
@@ -159,7 +170,9 @@ class CacheMetadataStore(BaseMetadataStore):
 
         serializer = serializer or self.serializer
         dump_kwargs = dump_kwargs or self.serializer_dump_kwargs
-        self.cache_store.put(key, value, serializer, dump_kwargs=dump_kwargs)
+        artifact = self.cache_store.put(key, value, serializer, dump_kwargs=dump_kwargs)
+        with self.cache_store.fs.open(self._artifact_meta_path(key), 'w') as fobj:
+            fobj.write(artifact.json(indent=2))
 
     def get(self, key: str, **load_kwargs) -> typing.Any:
         """Returns the value for the key if the key is in both the metadata and cache stores.
@@ -175,18 +188,41 @@ class CacheMetadataStore(BaseMetadataStore):
         value :
             the value for the key if the key is in both the metadata and cache stores.
         """
+        # TODO: Discuss whether the dataframe is overkill here or not
         # note: in an effort to avoid using a database/dataframe, I've made two primary simplifications here:
         # 1. I don't use the artifacts predetermine load_kwargs
         # 2. I've hard coded the serialzer
-        _load_kwargs = load_kwargs or self.serializer_load_kwargs or {}
-        return self.cache_store.get(key, 'xarray.zarr', **_load_kwargs)
+
+        x = self.df.loc[key]
+        _load_kwargs = load_kwargs or self.serializer_load_kwargs or x.load_kwargs
+        return self.cache_store.get(key, x.serializer, **_load_kwargs)
 
     def __contains__(self, key: str) -> bool:
-        return key in self.cache_store
+        return key in self.df.index
 
     @property
     def df(self) -> pd.DataFrame:
-        return NotImplemented
+        # TODO: Should we cache this operation? Listing items can be expensive
+        files = self.cache_store.fs.ls(self._metadata_store_path)
+        if not files:
+            return pd.DataFrame(
+                columns=[
+                    'key',
+                    'serializer',
+                    'load_kwargs',
+                    'dump_kwargs',
+                    'custom_fields',
+                    'checksum',
+                    'created_at',
+                ]
+            ).set_index('key')
+        entries = []
+        for file in files:
+            if file.endswith('.artifact.json'):
+                with self.cache_store.fs.open(file, 'r') as fobj:
+                    entries.append(json.load(fobj))
+
+        return pd.DataFrame(entries).set_index('key')
 
 
 @pydantic.dataclasses.dataclass
