@@ -21,6 +21,7 @@ dependencies:
   - sqlalchemy-utils
   - sqlalchemy>=1.4.21
   - xarray
+  - xcollection
   - zarr
   - pip:
       - -r ../requirements.txt
