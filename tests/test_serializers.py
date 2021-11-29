@@ -12,9 +12,15 @@ import funnel
         ({'foo': 'bar'}, 'joblib'),
         (xr.DataArray([1, 2]), 'xarray.netcdf'),
         (xr.DataArray([1, 2]).to_dataset(name='test'), 'xarray.netcdf'),
-        (xc.Collection({'foo':xr.DataArray([1, 2]).to_dataset(name='test'),
-                        'bar':xr.DataArray([1, 2]).to_dataset(name='test')}),
-                        'xcollection')
+        (
+            xc.Collection(
+                {
+                    'foo': xr.DataArray([1, 2]).to_dataset(name='test'),
+                    'bar': xr.DataArray([1, 2]).to_dataset(name='test'),
+                }
+            ),
+            'xcollection',
+        ),
     ],
 )
 def test_default_serializer(value, expected_serializer):
