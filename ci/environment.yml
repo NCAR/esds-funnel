@@ -24,4 +24,3 @@ dependencies:
   - zarr
   - pip:
       - -r ../requirements.txt
-      - git+https://github.com/NCAR/xcollection
