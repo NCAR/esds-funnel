@@ -108,12 +108,15 @@ class CacheStore:
             print(f'DRY RUN: would delete items with keys: {repr(keys)}')
 
     def __getitem__(self, key: str) -> typing.Any:
+        """Returns the artifact corresponding to the key."""
         return self.get(key)
 
     def __setitem__(self, key: str, value: typing.Any) -> None:
+        """Sets the key and corresponding artifact in the cache store."""
         self.put(key, value)
 
     def __delitem__(self, key: str) -> None:
+        """Deletes the key and corresponding artifact from the cache store."""
         self.delete(key, dry_run=False)
 
     @pydantic.validate_arguments
@@ -146,6 +149,14 @@ class CacheStore:
         value :
             the value for the key if the key is in the cache store.
 
+        Examples
+        --------
+        >>> from funnel import CacheStore
+        >>> store = CacheStore("/tmp/my-cache")
+        >>> store.keys()
+        ['foo']
+        >>> store.get("foo")
+        [1, 2, 3]
         """
 
         metadata_file = self._artifact_meta_relative_path(key)
@@ -203,6 +214,16 @@ class CacheStore:
         value : typing.Any
             Reference to the value that was put in the cache store.
 
+        Examples
+        --------
+        >>> from funnel import CacheStore
+        >>> store = CacheStore("/tmp/my-cache")
+        >>> store.keys()
+        []
+        >>> store.put("foo", [1, 2, 3])
+        >>> store.keys()
+        ['foo']
+
         """
         dump_kwargs = dump_kwargs or {}
         custom_fields = custom_fields or {}
@@ -228,7 +249,6 @@ class CacheStore:
     def _put_overwrite(self, artifact: Artifact) -> None:
         serializer = registry.serializers.get(artifact.serializer)()
         with self.fs.transaction:
-            print(f'Writing {artifact._value} to cache store')
             serializer.dump(
                 artifact._value, self._construct_item_path(artifact.key), **artifact.dump_kwargs
             )
