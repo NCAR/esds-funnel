@@ -3,6 +3,7 @@ import typing
 
 import pydantic
 import xarray as xr
+import xcollection as xc
 
 from .registry import registry
 
@@ -22,6 +23,11 @@ def xarray_zarr() -> Serializer:
 @registry.serializers.register('xarray.netcdf')
 def xarray_netcdf() -> Serializer:
     return Serializer('xarray.netcdf', xr.open_dataset, xr.backends.api.to_netcdf)
+
+
+@registry.serializers.register('xcollection')
+def xcollection() -> Serializer:
+    return Serializer('xcollection', xc.open_collection, xc.Collection.to_zarr)
 
 
 @registry.serializers.register('joblib')
@@ -56,3 +62,8 @@ def _(obj):
 @pick_serializer.register(xr.DataArray)
 def _(obj):
     return registry.serializers.get('xarray.netcdf')().name
+
+
+@pick_serializer.register(xc.Collection)
+def _(obj):
+    return registry.serializers.get('xcollection')().name
