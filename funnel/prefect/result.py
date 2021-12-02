@@ -8,7 +8,7 @@ import pydantic
 from prefect.engine.result import Result
 from slugify import slugify
 
-from ..metadata_db.main import MemoryMetadataStore, SQLMetadataStore
+from ..cache import CacheStore
 
 
 @pydantic.dataclasses.dataclass
@@ -17,12 +17,19 @@ class FunnelResult(Result):
     A result class that is used to store the results of a task in a funnel Metadata store.
     """
 
-    metadata_store: typing.Union['SQLMetadataStore', 'MemoryMetadataStore']
+    cache_store: CacheStore
+    serializer: str = 'auto'
+    serializer_dump_kwargs: typing.Dict[str, typing.Any] = None
+    serializer_load_kwargs: typing.Dict[str, typing.Any] = None
     kwargs: typing.Dict[str, typing.Any] = None
 
     def __post_init_post_parse__(self):
         self.kwargs = self.kwargs or {}
+        self._serializer = self.serializer
         super().__init__(**self.kwargs)
+        self.serializer = self._serializer
+        self.serializer_dump_kwargs = self.serializer_dump_kwargs or {}
+        self.serializer_load_kwargs = self.serializer_load_kwargs or {}
 
     @property
     def default_location(self) -> str:
@@ -46,7 +53,7 @@ class FunnelResult(Result):
         new.location = location
 
         self.logger.debug('Starting to read result from {}...'.format(location))
-        new.value = self.metadata_store.get(key=location)
+        new.value = self.cache_store.get(key=location, load_kwargs=new.serializer_load_kwargs)
         self.logger.debug('Finished reading result from {}...'.format(location))
         return new
 
@@ -67,7 +74,7 @@ class FunnelResult(Result):
         assert new.location is not None
 
         self.logger.debug('Starting to upload result to {}...'.format(new.location))
-        self.metadata_store.put(key=new.location, value=new.value)
+        self.cache_store.put(key=new.location, value=new.value, serializer=self.serializer, dump_kwargs=new.serializer_dump_kwargs)
         self.logger.debug('Finished uploading result to {}.'.format(new.location))
         return new
 
@@ -82,7 +89,7 @@ class FunnelResult(Result):
         kwargs : typing.Any
             Additional keyword arguments.
         """
-        return location in self.metadata_store
+        return location in self.cache_store
 
 
 # Fixes https://github.com/samuelcolvin/pydantic/issues/704
