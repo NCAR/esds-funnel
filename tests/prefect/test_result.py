@@ -23,10 +23,8 @@ ds = xr.tutorial.open_dataset('air_temperature').isel(time=0)
 )
 def test_result(data, serializer):
     r = FunnelResult(
-        
-            CacheStore(),
-            serializer=serializer,
-        
+        CacheStore(),
+        serializer=serializer,
     )
 
     new = r.write(data)
@@ -45,10 +43,8 @@ def test_result(data, serializer):
 def test_result_flow(executor):
     os.environ['PREFECT__FLOWS__CHECKPOINTING'] = 'True'
     r = FunnelResult(
-        
-            CacheStore(),
-            serializer='xarray.netcdf',
-        
+        CacheStore(),
+        serializer='xarray.netcdf',
     )
 
     @task(target='testing.nc', result=r)

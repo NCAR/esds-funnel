@@ -24,7 +24,7 @@ def test_has(registry_name, func_name, expected):
         ('serializers', 'xarray.netcdf'),
         ('serializers', 'xarray.zarr'),
         ('serializers', 'joblib'),
-        ('serializers', 'xcollection')
+        ('serializers', 'xcollection'),
     ],
 )
 def test_get(registry_name, func_name):

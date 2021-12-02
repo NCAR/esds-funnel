@@ -74,7 +74,12 @@ class FunnelResult(Result):
         assert new.location is not None
 
         self.logger.debug('Starting to upload result to {}...'.format(new.location))
-        self.cache_store.put(key=new.location, value=new.value, serializer=self.serializer, dump_kwargs=new.serializer_dump_kwargs)
+        self.cache_store.put(
+            key=new.location,
+            value=new.value,
+            serializer=self.serializer,
+            dump_kwargs=new.serializer_dump_kwargs,
+        )
         self.logger.debug('Finished uploading result to {}.'.format(new.location))
         return new
 
