@@ -8,9 +8,8 @@ For more details and examples, refer to the relevant chapters in the main part o
 maxdepth: 2
 caption: Reference
 ---
-cache.md
-metadata.md
-prefect.md
 registry.md
-config.md
+cache.md
+prefect.md
+
 ```
