@@ -1,4 +1,3 @@
-dask[complete]
 xarray
 zarr
 netcdf4
@@ -6,8 +5,5 @@ pydantic
 catalogue
 fsspec
 joblib
-sqlalchemy-utils
-sqlalchemy>=1.4.21
-s3fs
 prefect >=0.15.9,<2.0
 xcollection

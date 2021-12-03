@@ -15,13 +15,12 @@ dependencies:
   - prefect
   - pydantic
   - python=3.9
-  - s3fs
+  - sphinx-autobuild
   - sphinx-comments
   - sphinx-copybutton
   - sphinx-inline-tabs
   - xarray
   - zarr
-  - sphinx-autobuild
   - pip:
       - sphinxext-opengraph
       - autodoc_pydantic
