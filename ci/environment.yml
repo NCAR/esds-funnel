@@ -6,7 +6,6 @@ dependencies:
   - catalogue
   - dask
   - fsspec
-  - intake-esm
   - joblib
   - netcdf4
   - pip
@@ -17,9 +16,6 @@ dependencies:
   - pytest-cov
   - pytest-sugar
   - pytest-xdist
-  - s3fs
-  - sqlalchemy-utils
-  - sqlalchemy>=1.4.21
   - xarray
   - zarr
   - pip:
