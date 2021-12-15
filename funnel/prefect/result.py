@@ -69,7 +69,7 @@ class FunnelResult(Result):
             Additional keyword arguments
         """
 
-        new = self.format(**{})
+        new = self.format(**kwargs)
         new.value = value_
         assert new.location is not None
 
