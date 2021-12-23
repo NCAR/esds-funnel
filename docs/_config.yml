@@ -1,2 +1,4 @@
 title: Funnel
 author: NCAR Xdev Team
+execute:
+  execute_notebooks: 'off'
