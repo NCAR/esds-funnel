@@ -47,7 +47,7 @@ repos:
       - id: nbqa-isort
         additional_dependencies: [isort==v5.9.3]
   - repo: https://github.com/executablebooks/jupyter-book
-    rev: v0.11.2
+    rev: v0.12.1
     hooks:
       - id: jb-to-sphinx
-        args: ["docs"]
+        args: ['docs']
