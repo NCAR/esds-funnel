@@ -13,6 +13,7 @@ repos:
     rev: 21.12b0
     hooks:
       - id: black-jupyter
+        exclude: docs/conf.py
 
   - repo: https://github.com/keewis/blackdoc
     rev: v0.3.4

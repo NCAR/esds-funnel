@@ -3,9 +3,7 @@ line-length = 100
 target-version = ['py38']
 skip-string-normalization = true
 extend-exclude = '''
-/(
-  | docs/conf.py
-)/
+  docs/conf.py
 '''
 
 [tool.check-manifest]
