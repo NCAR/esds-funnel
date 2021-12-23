@@ -3,6 +3,7 @@ channels:
   - nodefaults
   - conda-forge
 dependencies:
+  - jupyter-book
   - catalogue
   - dask
   - fsspec
