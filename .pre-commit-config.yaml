@@ -41,7 +41,7 @@ repos:
       - id: prettier
 
   - repo: https://github.com/executablebooks/jupyter-book
-    rev: v0.12.1
+    rev: v0.12.2
     hooks:
       - id: jb-to-sphinx
         args: ['docs']
