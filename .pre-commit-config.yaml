@@ -44,4 +44,4 @@ repos:
     rev: v0.12.2
     hooks:
       - id: jb-to-sphinx
-        args: ['docs']
+        args: ["docs"]
